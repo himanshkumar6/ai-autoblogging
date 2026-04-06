@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
 
@@ -6,7 +8,7 @@ const topics = [
   "Top trending cryptocurrencies today",
   "Best side hustles in 2026",
   "AI tools for making money",
-  "Personal finance tips for beginners"
+  "Personal finance tips for beginners",
 ];
 
 function generateSlug(title: string) {
@@ -18,7 +20,7 @@ function generateSlug(title: string) {
     .trim();
 }
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function GET(request: Request) {
   // We use GET for cron jobs usually, but Vercel Cron sends GET requests.
@@ -26,58 +28,66 @@ export async function GET(request: Request) {
     // 1. Pick a random topic
     const topic = topics[Math.floor(Math.random() * topics.length)];
     const baseUrl = new URL(request.url).origin;
-    
+
     // 2. Generate Blog Post
     console.log(`[Auto-Run] Generating post for topic: ${topic}`);
     let postResponse = await fetch(`${baseUrl}/api/generate-post`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ topic })
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ topic }),
     });
-    
+
     // Simple Retry Logic for Claude
     if (!postResponse.ok) {
       console.warn(`[Auto-Run] First attempt failed. Retrying in 10s...`);
       await sleep(10000); // Wait 10 seconds to avoid rate limits
       postResponse = await fetch(`${baseUrl}/api/generate-post`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic }),
       });
-      if (!postResponse.ok) throw new Error("Failed to generate post after retry");
+      if (!postResponse.ok)
+        throw new Error("Failed to generate post after retry");
     }
 
     const postData = await postResponse.json();
     const slug = generateSlug(postData.title);
-    
+
     // 3. Save to Supabase
     console.log(`[Auto-Run] Saving post to DB with slug: ${slug}`);
-    
+
     // Ensure slug doesn't conflict by adding random string if exists
     // (For MVP, just append date if conflict is found, but let's try direct insert first)
     const { data: insertedPost, error: insertError } = await supabase
-      .from('posts')
+      .from("posts")
       .insert([
-        { 
-          title: postData.title, 
-          slug: slug, 
-          content: postData.content, 
-          meta_description: postData.meta 
-        }
+        {
+          title: postData.title,
+          slug: slug,
+          content: postData.content,
+          meta_description: postData.meta,
+        },
       ])
       .select()
       .single();
-      
+
     if (insertError) {
       // Very basic duplicate handling: append random numbers
-      if (insertError.code === '23505') { // Unique violation
+      if (insertError.code === "23505") {
+        // Unique violation
         const newSlug = `${slug}-${Math.floor(Math.random() * 10000)}`;
         const { error: retryError } = await supabase
-          .from('posts')
+          .from("posts")
           .insert([
-            { title: postData.title, slug: newSlug, content: postData.content, meta_description: postData.meta }
+            {
+              title: postData.title,
+              slug: newSlug,
+              content: postData.content,
+              meta_description: postData.meta,
+            },
           ]);
-        if (retryError) throw new Error(`DB Insert Error after retry: ${retryError.message}`);
+        if (retryError)
+          throw new Error(`DB Insert Error after retry: ${retryError.message}`);
       } else {
         throw new Error(`DB Insert Error: ${insertError.message}`);
       }
@@ -87,9 +97,9 @@ export async function GET(request: Request) {
     console.log(`[Auto-Run] Generating tweet`);
     const postUrl = `${baseUrl}/blog/${slug}`;
     const tweetResponse = await fetch(`${baseUrl}/api/generate-tweet`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: postData.content, url: postUrl })
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: postData.content, url: postUrl }),
     });
 
     if (!tweetResponse.ok) throw new Error("Failed to generate tweet");
@@ -99,9 +109,9 @@ export async function GET(request: Request) {
     console.log(`[Auto-Run] Posting to X via Twikit endpoint`);
     try {
       const xResponse = await fetch(`${baseUrl}/api/post-tweet`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tweet: tweetData.tweet })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tweet: tweetData.tweet }),
       });
 
       if (!xResponse.ok) {
@@ -112,10 +122,10 @@ export async function GET(request: Request) {
         // Update DB tweeted status
         console.log(`[Auto-Run] Tweet posted successfully. Updating DB.`);
         const { error: updateError } = await supabase
-          .from('posts')
+          .from("posts")
           .update({ tweeted: true })
-          .eq('slug', slug);
-          
+          .eq("slug", slug);
+
         if (updateError) console.error("Failed to update tweet status in DB");
       }
     } catch (e) {

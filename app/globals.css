@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-start: #f8fafc;
+    --bg-end: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --glass-border: rgba(0, 0, 0, 0.1);
+    --glass-bg: rgba(255, 255, 255, 0.6);
+    --glass-bg-hover: rgba(255, 255, 255, 0.8);
+  }
+
+  .dark {
+    --bg-start: #0a0a0a;
+    --bg-end: #09090b;
+    /* Extra gradient deep stops can be added at the layout level */
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-bg: rgba(20, 20, 25, 0.4);
+    --glass-bg-hover: rgba(40, 40, 50, 0.5);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Custom scrollbar for premium feel */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 10px;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+  }
+}
+
+body {
+  background-color: var(--bg-start);
+  color: var(--text-primary);
+  /* The radial body gradient requested */
+  background-image: radial-gradient(circle at top, var(--bg-start) 0%, var(--bg-end) 100%);
+  background-attachment: fixed;
+}

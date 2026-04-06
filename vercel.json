@@ -1,0 +1,14 @@
+{
+  "crons": [
+    {
+      "path": "/api/auto-run",
+      "schedule": "0 */6 * * *"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/post-tweet",
+      "destination": "/api/post-tweet.py"
+    }
+  ]
+}

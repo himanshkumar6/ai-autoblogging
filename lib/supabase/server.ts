@@ -1,6 +1,12 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+/**
+ * Server Client Generator
+ * 
+ * This creates a Supabase client for use in Server Components, Route Handlers, 
+ * and Server Actions.
+ */
 export function createClient() {
   const cookieStore = cookies();
 
@@ -14,23 +20,23 @@ export function createClient() {
         },
         set(name: string, value: string, options: CookieOptions) {
           try {
+            // This will work in Route Handlers and Server Actions.
+            // It will FAIL in Server Components.
             cookieStore.set({ name, value, ...options });
           } catch (error) {
             // The `set` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
+            // In Next.js, Server Components cannot set cookies.
+            // This is ignored because the middleware refreshes the session.
           }
         },
         remove(name: string, options: CookieOptions) {
           try {
             cookieStore.set({ name, value: "", ...options });
           } catch (error) {
-            // The `delete` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
+            // Same logic as `set`
           }
         },
       },
-    }
+    },
   );
 }

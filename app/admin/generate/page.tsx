@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 
 export default function AdminGenerate() {
   const [topic, setTopic] = useState("");
@@ -9,8 +8,6 @@ export default function AdminGenerate() {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
-
-  const supabase = createClient();
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,23 +39,22 @@ export default function AdminGenerate() {
   const handlePublish = async () => {
     if (!result) return;
     setIsLoading(true);
+    setError("");
     try {
-      // Slugify title
-      const slug = result.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-      
-      const { error: dbError } = await supabase
-        .from("posts")
-        .insert([{
+      const res = await fetch("/api/save-post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           title: result.title,
-          slug: slug,
           content: result.content,
-          meta_description: result.meta,
-          published: true, // Auto publish from manual interface for now
-          tweeted: false
-        }]);
-        
-      if (dbError) throw new Error(dbError.message);
-      
+          meta: result.meta,
+          published: true,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to save post");
+
       setSaved(true);
     } catch (err: any) {
       setError(err.message);

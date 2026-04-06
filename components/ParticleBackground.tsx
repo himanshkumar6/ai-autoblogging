@@ -1,11 +1,17 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useTheme } from "next-themes";
 
+/**
+ * Premium SaaS Particle Background
+ * Features:
+ * - High-speed Canvas rendering
+ * - Elegant, slow-moving glowing dots
+ * - Adaptive dot count (performance-focused)
+ * - Harmonious purple/blue/cyan palette
+ */
 export default function ParticleBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -16,8 +22,8 @@ export default function ParticleBackground() {
     let animationFrameId: number;
     let particles: Particle[] = [];
 
-    // Colors mapping roughly to: cyan, purple, blue, pink, orange, green, indigo
-    const colors = ["#06b6d4", "#a855f7", "#3b82f6", "#ec4899", "#f97316", "#10b981", "#6366f1"];
+    // Premium SaaS Palette: Purple, Blue, Cyan
+    const colors = ["#8b5cf6", "#3b82f6", "#06b6d4"];
 
     const resize = () => {
       canvas.width = window.innerWidth;
@@ -32,29 +38,39 @@ export default function ParticleBackground() {
       velocityX: number;
       velocityY: number;
       color: string;
-      alpha: number;
+      opacity: number;
+      fadeDirection: number;
 
       constructor() {
         this.x = Math.random() * canvas!.width;
         this.y = Math.random() * canvas!.height;
-        this.size = Math.random() * 2 + 0.5; // Small sand particles
-        // Super slow movement
-        this.velocityX = (Math.random() - 0.5) * 0.3;
-        this.velocityY = (Math.random() - 0.5) * 0.3;
+        this.size = Math.random() * 2 + 1; // 1-3px dots
+        
+        // Ultra-slow, elegant movement
+        this.velocityX = (Math.random() - 0.5) * 0.15;
+        this.velocityY = (Math.random() - 0.5) * 0.15;
+        
         this.color = colors[Math.floor(Math.random() * colors.length)];
-        // Opacity depends on theme, but generally very subtle
-        this.alpha = resolvedTheme === "dark" ? Math.random() * 0.5 + 0.2 : Math.random() * 0.3 + 0.1;
+        this.opacity = Math.random() * 0.5 + 0.1;
+        this.fadeDirection = Math.random() > 0.5 ? 0.005 : -0.005;
       }
 
       update() {
         this.x += this.velocityX;
         this.y += this.velocityY;
 
-        // Wrap around edges
+        // Subtle opacity pulsing
+        this.opacity += this.fadeDirection;
+        if (this.opacity > 0.6 || this.opacity < 0.1) {
+          this.fadeDirection *= -1;
+        }
+
+        // Seamless wrap-around
         if (this.x > canvas!.width) this.x = 0;
-        if (this.x < 0) this.x = canvas!.width;
+        else if (this.x < 0) this.x = canvas!.width;
+        
         if (this.y > canvas!.height) this.y = 0;
-        if (this.y < 0) this.y = canvas!.height;
+        else if (this.y < 0) this.y = canvas!.height;
       }
 
       draw() {
@@ -62,51 +78,55 @@ export default function ParticleBackground() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         
-        // Glow effect
-        ctx.shadowBlur = resolvedTheme === "dark" ? 8 : 4;
+        // Soft focus glow
+        ctx.shadowBlur = 10;
         ctx.shadowColor = this.color;
         
         ctx.fillStyle = this.color;
-        ctx.globalAlpha = this.alpha;
+        ctx.globalAlpha = this.opacity;
         ctx.fill();
-        ctx.globalAlpha = 1; // Reset
-        ctx.shadowBlur = 0; // Reset
+        
+        // Reset for performance optimization
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur = 0;
       }
     }
 
     const initParticles = () => {
       particles = [];
-      // Keep count moderate for performance
-      const particleCount = window.innerWidth < 768 ? 40 : 80;
-      for (let i = 0; i < particleCount; i++) {
+      // Higher density but smaller dots for "funded startup" look
+      const particleCount = Math.floor((canvas.width * canvas.height) / 15000);
+      const cappedCount = Math.min(particleCount, 100); // Performance cap
+      
+      for (let i = 0; i < cappedCount; i++) {
         particles.push(new Particle());
       }
     };
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach((particle) => {
-        particle.update();
-        particle.draw();
+      particles.forEach((p) => {
+        p.update();
+        p.draw();
       });
       animationFrameId = requestAnimationFrame(animate);
     };
 
     window.addEventListener("resize", resize);
-    resize(); // also initializes particles
+    resize();
     animate();
 
     return () => {
       window.removeEventListener("resize", resize);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [resolvedTheme]); // Re-init on theme change to adjust opacity/glow
+  }, []);
 
   return (
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none z-0"
-      style={{ opacity: 0.8 }}
+      style={{ opacity: 0.6, mixBlendMode: 'screen' }}
     />
   );
 }

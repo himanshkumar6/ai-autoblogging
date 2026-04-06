@@ -1,7 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
 import AdminSidebar from "@/components/AdminSidebar";
+import ParticleBackground from "@/components/ParticleBackground";
+import { redirect } from "next/navigation";
 
-export default async function AdminLayout({
+/**
+ * app/admin/layout.tsx — Premium Dashboard Layout (Root)
+ * 
+ * Fixed theme support:
+ * - Adaptive background (Light/Dark)
+ * - Optimized content spacing
+ */
+export default async function AdminRootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -9,23 +18,36 @@ export default async function AdminLayout({
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  // Guard: Redirect to login if unauthenticated
+  if (!user) {
+    redirect("/admin/login");
+  }
+
   return (
-    <div className="min-h-screen text-gray-800 dark:text-gray-200 flex flex-col md:flex-row relative z-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#050505] text-gray-900 dark:text-white transition-colors duration-500 selection:bg-purple-500/30">
       
-      {/* Light/Dark Vibrant Bokeh Effect Background */}
-      <div className="fixed inset-0 overflow-hidden -z-10 pointer-events-none bg-slate-50 dark:bg-[#060813] transition-colors duration-500">
-        {/* Soft glowing orbs */}
-        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-purple-400/20 dark:bg-purple-600/20 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-pulse duration-[10000ms]" />
-        <div className="absolute top-[20%] -right-[10%] w-[40%] h-[60%] rounded-full bg-cyan-300/30 dark:bg-cyan-600/10 blur-[120px] mix-blend-multiply dark:mix-blend-screen" />
-        <div className="absolute -bottom-[20%] left-[20%] w-[60%] h-[50%] rounded-full bg-indigo-300/30 dark:bg-indigo-600/10 blur-[150px] mix-blend-multiply dark:mix-blend-screen animate-pulse duration-[15000ms]" />
+      {/* 1. Global Background System */}
+      <div className="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
+        {/* Dark Mode Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-[#0b0b1a] to-[#1a1a2e] dark:opacity-100 opacity-0 transition-opacity duration-700" />
+        
+        {/* Light Mode Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white via-slate-50 to-purple-50 dark:opacity-0 opacity-100 transition-opacity duration-700" />
+        
+        {/* Subtle Glowing Mesh (Theme Adaptive) */}
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-purple-600/10 dark:bg-purple-500/10 blur-[120px] animate-pulse duration-[10000ms]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/10 dark:bg-blue-500/10 blur-[120px] animate-pulse duration-[8000ms]" />
       </div>
 
-      {/* Admin Sidebar with mobile responsiveness */}
-      <AdminSidebar userEmail={user?.email || "Admin@cryptonews.local"} />
+      {/* 2. Floating Particle System */}
+      <ParticleBackground />
 
-      {/* Main Content Area */}
-      <main className="flex-1 w-full overflow-x-hidden p-6 md:p-10 relative">
-        <div className="max-w-5xl mx-auto w-full pt-4 md:pt-8 pb-16">
+      {/* 3. Fixed Sidebar Component */}
+      <AdminSidebar userEmail={user.email!} />
+
+      {/* 4. Main Content Area */}
+      <main className="lg:ml-64 flex-1 min-h-screen relative pt-20 lg:pt-0">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10 pt-10 pb-20">
           {children}
         </div>
       </main>

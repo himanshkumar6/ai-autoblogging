@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
 /**
- * Build-safe Admim Supabase Client Getter
+ * Build-safe Admin Supabase Client Getter
  * 
  * Ensures process.env is only accessed at runtime and prevents
  * build-time crashes if SUPABASE_SERVICE_ROLE_KEY is missing during static analysis.
@@ -20,8 +20,3 @@ export function getSupabaseAdmin() {
 
   return createClient(url, key)
 }
-
-// Deprecated: Use getSupabaseAdmin() instead.
-export const supabaseAdmin = (process.env.SUPABASE_SERVICE_ROLE_KEY) 
-  ? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || '', process.env.SUPABASE_SERVICE_ROLE_KEY || '')
-  : null as any;

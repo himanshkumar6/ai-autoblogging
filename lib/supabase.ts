@@ -11,13 +11,12 @@ export function getSupabase() {
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseKey) {
-    throw new Error("Missing Supabase configuration. Check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.")
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error("Missing Supabase configuration. Check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.")
+    }
+    // Return a placeholder client during build time if env is missing
+    return createClient('https://placeholder.supabase.co', 'placeholder')
   }
 
   return createClient(supabaseUrl, supabaseKey)
 }
-
-// Deprecated: Use getSupabase() instead.
-export const supabase = (typeof window !== 'undefined' || process.env.NODE_ENV === 'test') 
-  ? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || '', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '')
-  : null as any;

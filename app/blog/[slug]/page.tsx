@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -14,6 +14,7 @@ interface Props {
 export const revalidate = 60;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const supabase = getSupabase();
   const { data } = await supabase
     .from("posts")
     .select("title, meta_description")
@@ -40,6 +41,7 @@ function estimateReadTime(text: string) {
 }
 
 export default async function BlogPostPage({ params }: Props) {
+  const supabase = getSupabase();
   const { data: post, error } = await supabase
     .from("posts")
     .select("*")

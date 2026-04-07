@@ -28,16 +28,16 @@ export default async function DashboardLayout({
 
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white selection:bg-purple-500/30">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#050505] text-gray-900 dark:text-white selection:bg-purple-500/30">
       
       {/* 1. Global Background System */}
       <div className="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
         {/* Animated deep space gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-[#0b0b1a] to-[#1a1a2e]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-100 via-white to-gray-50 dark:from-black dark:via-[#0b0b1a] dark:to-[#1a1a2e]" />
         
         {/* Subtle glowing mesh overlays */}
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-purple-600/10 blur-[120px] animate-pulse duration-[10000ms]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/10 blur-[120px] animate-pulse duration-[8000ms]" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-purple-600/5 dark:bg-purple-600/10 blur-[120px] animate-pulse duration-[10000ms]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/5 dark:bg-blue-600/10 blur-[120px] animate-pulse duration-[8000ms]" />
       </div>
 
       {/* 2. Floating Particle System */}

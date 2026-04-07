@@ -68,3 +68,37 @@ CREATE POLICY "Allow authenticated full access"
   TO authenticated
   USING (true)
   WITH CHECK (true);
+
+-- ============================================================
+-- Application Settings (Key-Value Store)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS public.settings (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  key           TEXT NOT NULL UNIQUE,
+  value         JSONB NOT NULL,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Index for fast lookup by key
+CREATE INDEX IF NOT EXISTS idx_settings_key ON public.settings (key);
+
+-- Trigger to update updated_at
+DROP TRIGGER IF EXISTS set_updated_at_settings ON public.settings;
+CREATE TRIGGER set_updated_at_settings
+BEFORE UPDATE ON public.settings
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Enable RLS
+ALTER TABLE public.settings ENABLE ROW LEVEL SECURITY;
+
+-- Notice: Service Role natively bypasses RLS for reading/writing all API keys.
+-- We only grant authenticated users full access if admin dashboard logic operates on the client.
+-- In our securely integrated model, server actions use getSupabaseAdmin() bypassing RLS entirely.
+CREATE POLICY "Allow authenticated full access to settings"
+  ON public.settings
+  FOR ALL
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);

@@ -27,7 +27,7 @@ export default async function Home() {
         
         <Container>
           <div className="max-w-4xl mx-auto text-center relative z-10">
-            <h1 className="text-5xl sm:text-7xl font-black tracking-tighter text-primary mb-8 leading-[1.1]">
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tighter text-primary mb-8 leading-[1.1]">
               Crypto Insights <br className="hidden sm:block" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan via-accent-blue to-accent-purple drop-shadow-sm">
                 Powered by AI

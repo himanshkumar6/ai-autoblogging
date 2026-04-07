@@ -4,7 +4,15 @@ import { useState } from "react";
 import { saveSettings } from "@/app/actions/settings";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Save, Layout, Activity, Code, Bot, Twitter, AlertCircle, CheckCircle2 
+  Save, 
+  Layout, 
+  Activity, 
+  Code, 
+  Bot, 
+  Twitter, 
+  AlertCircle, 
+  CheckCircle2, 
+  ChevronRight 
 } from "lucide-react";
 import GlassCard from "./GlassCard";
 
@@ -34,8 +42,12 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Rec
     adsenseEnabled: initialSettings.adsenseEnabled === "true" || initialSettings.adsenseEnabled === true,
     aiApiKey: initialSettings.aiApiKey || "",
     aiProvider: initialSettings.aiProvider || "gemini",
+    gemini_api_key: initialSettings.gemini_api_key || "",
+    gemini_enabled: initialSettings.gemini_enabled === "true" || initialSettings.gemini_enabled === true,
+    openai_api_key: initialSettings.openai_api_key || "",
+    openai_enabled: initialSettings.openai_enabled === "true" || initialSettings.openai_enabled === true,
     claudeApiKey: initialSettings.claudeApiKey || "",
-    claudeModel: initialSettings.claudeModel || "claude-3-haiku",
+    claudeModel: initialSettings.claudeModel || "claude-3-haiku-20240307",
     claudeEnabled: initialSettings.claudeEnabled === "true" || initialSettings.claudeEnabled === true,
     xApiKey: initialSettings.xApiKey || "",
     xApiSecret: initialSettings.xApiSecret || "",
@@ -65,9 +77,9 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Rec
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 lg:items-start max-w-6xl mx-auto">
-      {/* Sidebar Tabs */}
-      <GlassCard className="w-full lg:w-64 p-3 flex flex-col gap-1 z-10 shrink-0">
+    <div className="flex flex-col lg:flex-row gap-8 lg:items-start max-w-7xl mx-auto pb-24 md:pb-0">
+      {/* Sidebar Tabs - Vertical List (Sidebar Style) */}
+      <GlassCard className="w-full lg:w-72 p-3 flex flex-col gap-2 z-10 shrink-0 sticky top-16 md:top-6 lg:top-8 bg-white/60 dark:bg-[#050505]/60 backdrop-blur-2xl border-gray-200 dark:border-white/5 shadow-xl">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -75,61 +87,75 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Rec
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-3 w-full text-left px-4 py-3 rounded-xl transition-all font-semibold text-sm ${
-                isActive ? "bg-purple-500/10 dark:bg-white/10 text-purple-600 dark:text-white" : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-gray-200"
-              }`}
+              className={`
+                group relative flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-black transition-all duration-300 w-full text-left
+                ${isActive 
+                  ? "bg-purple-600/10 dark:bg-white/10 text-purple-700 dark:text-white shadow-[0_4px_20px_rgba(124,58,237,0.1)] border border-purple-500/20 dark:border-white/10" 
+                  : "text-gray-400 dark:text-gray-500 hover:text-purple-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 border border-transparent"
+                }
+              `}
             >
-              <Icon size={18} className={isActive ? "text-purple-500 dark:text-purple-400" : ""} />
-              {tab.label}
+              {isActive && (
+                <div className="absolute left-0 w-1.5 h-6 bg-gradient-to-b from-purple-500 to-indigo-600 rounded-r-full" />
+              )}
+              
+              <Icon size={18} className={`${isActive ? "text-purple-600 dark:text-purple-400" : "group-hover:text-purple-500 dark:group-hover:text-purple-300"} transition-colors shrink-0`} />
+              
+              <span className="flex-1 uppercase tracking-widest text-[10px]">{tab.label}</span>
+              
+              <ChevronRight size={14} className={`${isActive ? "opacity-100" : "opacity-0 group-hover:opacity-40 transition-opacity"}`} />
             </button>
           );
         })}
 
-        <div className="mt-8 pt-4 border-t border-gray-200 dark:border-white/10">
+        <div className="mt-8 pt-6 border-t border-gray-200 dark:border-white/10 px-2 pb-2">
           <button 
             onClick={handleSave}
             disabled={isSaving}
-            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-purple-500/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black py-4 px-4 rounded-xl shadow-xl shadow-purple-500/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-xs uppercase tracking-widest"
           >
-            {isSaving ? <Activity className="animate-spin" size={18} /> : <Save size={18} />}
-            {isSaving ? "Deploying..." : "Save Config"}
+            {isSaving ? <Activity className="animate-spin" size={16} /> : <Save size={16} />}
+            {isSaving ? "Deploying..." : "Save Config & Sync"}
           </button>
         </div>
       </GlassCard>
 
       {/* Content Area */}
-      <GlassCard className="flex-1 p-6 lg:p-10 z-10 w-full min-h-[500px]">
+      <GlassCard className="flex-1 p-6 md:p-8 lg:p-12 z-10 w-full min-h-[600px] border-gray-200 dark:border-white/5 bg-white/40 dark:bg-white/[0.02] backdrop-blur-xl">
         {status.type && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className={`mb-6 p-4 rounded-xl flex items-center gap-3 border ${status.type === 'success' ? 'bg-green-50 dark:bg-green-500/10 border-green-200 dark:border-green-500/20 text-green-700 dark:text-green-400' : 'bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400'}`}>
-            {status.type === "success" ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
-            <span className="text-sm font-semibold">{status.msg}</span>
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className={`mb-8 p-5 rounded-2xl flex items-center gap-4 border shadow-sm ${status.type === 'success' ? 'bg-green-50 dark:bg-green-500/10 border-green-200 dark:border-green-500/20 text-green-700 dark:text-green-400' : 'bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400'}`}>
+            {status.type === "success" ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+            <span className="text-sm font-black">{status.msg}</span>
           </motion.div>
         )}
 
-        <div className="space-y-6">
+        <div className="space-y-10">
           {activeTab === "general" && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-6 flex items-center gap-3"><Layout size={24} className="text-purple-500"/> General Settings</h2>
-              <div className="space-y-4 max-w-xl">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+              <div className="border-b border-gray-100 dark:border-white/5 pb-6">
+                <h2 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3 leading-tight"><Layout size={28} className="text-purple-500"/> General Platform Settings</h2>
+                <p className="text-gray-500 dark:text-white/40 text-sm font-bold mt-2 ml-[40px]">Configure your site's core identity and branding.</p>
+              </div>
+              <div className="space-y-6">
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1.5">Site Name</label>
-                  <input type="text" name="siteName" value={formData.siteName} onChange={handleChange} className="w-full bg-gray-50 dark:bg-[#050505] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-colors" />
+                  <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-2">Site Name</label>
+                  <input type="text" name="siteName" value={formData.siteName} onChange={handleChange} className="w-full bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/5 transition-all font-bold text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1.5">Site Description</label>
-                  <textarea name="siteDescription" rows={3} value={formData.siteDescription} onChange={handleChange} className="w-full bg-gray-50 dark:bg-[#050505] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-colors" />
+                  <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-2">Site Description</label>
+                  <textarea name="siteDescription" rows={4} value={formData.siteDescription} onChange={handleChange} className="w-full bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/5 transition-all font-bold text-sm leading-relaxed" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1.5">Site Favicon</label>
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center bg-white dark:bg-black overflow-hidden shadow-inner">
+                  <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-4">Site Favicon</label>
+                  <div className="flex flex-col sm:flex-row items-center gap-6 p-6 bg-gray-50/50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 rounded-2xl">
+                    <div className="w-20 h-20 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center bg-white dark:bg-black overflow-hidden shadow-inner shrink-0 scale-100 sm:scale-110">
                       {formData.faviconData ? (
-                         <img src={formData.faviconData} alt="Favicon" className="w-8 h-8 object-contain" />
+                         <img src={formData.faviconData} alt="Favicon" className="w-10 h-10 object-contain" />
                       ) : (
-                         <span className="text-gray-400 text-xs font-bold">ICO</span>
+                         <span className="text-gray-400 text-xs font-black">ICO</span>
                       )}
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 text-center sm:text-left">
                        <input 
                          type="file" 
                          accept=".ico,.png,.svg,.jpg,.jpeg" 
@@ -146,10 +172,10 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Rec
                            }
                          }} 
                        />
-                       <label htmlFor="favicon-upload" className="px-4 py-2.5 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:bg-gray-200 dark:hover:bg-white/10 rounded-xl text-sm font-bold cursor-pointer transition-colors text-gray-700 dark:text-gray-300 inline-block active:scale-95 shadow-sm">
-                         Upload Image
+                       <label htmlFor="favicon-upload" className="px-6 py-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 rounded-xl text-xs font-black cursor-pointer transition-all text-gray-700 dark:text-gray-300 inline-block active:scale-95 shadow-sm uppercase tracking-widest">
+                         Choose New Asset
                        </label>
-                       <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 font-medium">Replaces the globe icon on browser tabs.</p>
+                       <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-3 font-black uppercase tracking-widest">Replaces the globe icon on browser tabs.</p>
                     </div>
                   </div>
                 </div>
@@ -158,53 +184,59 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Rec
           )}
 
           {activeTab === "analytics" && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-6 flex items-center gap-3"><Activity size={24} className="text-purple-500"/> Analytics & Scripts</h2>
-              <div className="space-y-6 max-w-2xl">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+              <div className="border-b border-gray-100 dark:border-white/5 pb-6">
+                <h2 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3 leading-tight"><Activity size={28} className="text-purple-500"/> Tracking & Meta Engines</h2>
+                <p className="text-gray-500 dark:text-white/40 text-sm font-bold mt-2 ml-[40px]">Deploy analytics IDs and custom head scripts.</p>
+              </div>
+              <div className="space-y-6">
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1.5">Google Analytics (GA4) ID</label>
-                  <input type="text" name="ga4Id" placeholder="G-XXXXXXXXXX" value={formData.ga4Id} onChange={handleChange} className="w-full font-mono text-sm bg-gray-50 dark:bg-[#050505] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-colors" />
+                  <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-2">Google Analytics (GA4) ID</label>
+                  <input type="text" name="ga4Id" placeholder="G-XXXXXXXXXX" value={formData.ga4Id} onChange={handleChange} className="w-full font-mono text-sm bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/5 transition-all" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1.5">Custom Head Scripts (HTML/Meta)</label>
-                  <textarea name="customHeadScripts" rows={5} placeholder="<meta name='monetag' content='...'>" value={formData.customHeadScripts} onChange={handleChange} className="w-full font-mono text-sm bg-gray-50 dark:bg-[#050505] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-colors" />
+                  <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-2">Custom Head Scripts (HTML/Meta)</label>
+                  <textarea name="customHeadScripts" rows={8} placeholder="<meta name='monetag' content='...'>" value={formData.customHeadScripts} onChange={handleChange} className="w-full font-mono text-sm bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/5 transition-all leading-relaxed" />
                 </div>
               </div>
             </motion.div>
           )}
 
           {activeTab === "ads" && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-6 flex items-center gap-3"><Code size={24} className="text-purple-500"/> Ad Networks</h2>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-10">
+              <div className="border-b border-gray-100 dark:border-white/5 pb-6">
+                <h2 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3 leading-tight"><Code size={28} className="text-purple-500"/> Monetization Pipeline</h2>
+                <p className="text-gray-500 dark:text-white/40 text-sm font-bold mt-2 ml-[40px]">Manage ad units and network scripts globally.</p>
+              </div>
               
-              <div className="p-6 border border-purple-200 dark:border-purple-500/20 bg-purple-50 dark:bg-purple-500/5 rounded-2xl mb-6">
-                <h3 className="font-bold text-purple-900 dark:text-purple-100 mb-4 flex items-center gap-2"><Code size={18}/> Adsterra Integrations</h3>
-                <div className="space-y-5">
+              <div className="p-6 md:p-8 border border-purple-200 dark:border-purple-500/20 bg-purple-50/30 dark:bg-purple-500/5 rounded-3xl">
+                <h3 className="font-black text-purple-900 dark:text-purple-100 mb-6 flex items-center gap-3 uppercase tracking-widest text-xs"><Code size={20}/> Adsterra Integrations</h3>
+                <div className="space-y-6">
                   <div>
-                    <label className="block text-xs font-bold text-purple-700 dark:text-purple-300 uppercase tracking-widest mb-1.5">Banner Code (HTML)</label>
-                    <textarea name="adsterraBanner" rows={3} value={formData.adsterraBanner} onChange={handleChange} className="w-full font-mono text-sm bg-white dark:bg-[#050505] border border-purple-200 dark:border-purple-500/20 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-colors" />
+                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em] mb-2">Banner Code (HTML)</label>
+                    <textarea name="adsterraBanner" rows={4} value={formData.adsterraBanner} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold" />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-purple-700 dark:text-purple-300 uppercase tracking-widest mb-1.5">Native Code (HTML)</label>
-                    <textarea name="adsterraNative" rows={3} value={formData.adsterraNative} onChange={handleChange} className="w-full font-mono text-sm bg-white dark:bg-[#050505] border border-purple-200 dark:border-purple-500/20 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-colors" />
+                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em] mb-2">Native Code (HTML)</label>
+                    <textarea name="adsterraNative" rows={4} value={formData.adsterraNative} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold" />
                   </div>
-                  <div className="flex items-center gap-3 bg-white/50 dark:bg-black/30 p-3 rounded-xl border border-purple-200 dark:border-purple-500/10">
-                    <input type="checkbox" name="adsterraPopunder" checked={formData.adsterraPopunder} onChange={handleChange} className="w-5 h-5 accent-purple-600 rounded cursor-pointer" />
-                    <label className="text-sm font-semibold text-gray-900 dark:text-white cursor-pointer select-none">Enable Adsterra Popunder Globally</label>
+                  <div className="flex items-center gap-4 bg-white/60 dark:bg-black/40 p-4 rounded-xl border border-purple-200 dark:border-purple-500/10">
+                    <input type="checkbox" name="adsterraPopunder" checked={formData.adsterraPopunder} onChange={handleChange} className="w-6 h-6 accent-purple-600 rounded-lg cursor-pointer" />
+                    <label className="text-sm font-black text-gray-900 dark:text-white cursor-pointer select-none">Enable Adsterra Popunder Globally</label>
                   </div>
                 </div>
               </div>
 
-              <div className="p-6 border border-blue-200 dark:border-blue-500/20 bg-blue-50 dark:bg-blue-500/5 rounded-2xl">
-                <h3 className="font-bold text-blue-900 dark:text-blue-100 mb-4 flex items-center gap-2"><Code size={18}/> Google AdSense</h3>
-                <div className="space-y-5">
-                  <div className="flex items-center gap-3 bg-white/50 dark:bg-black/30 p-3 rounded-xl border border-blue-200 dark:border-blue-500/10">
-                    <input type="checkbox" name="adsenseEnabled" checked={formData.adsenseEnabled} onChange={handleChange} className="w-5 h-5 accent-blue-600 rounded cursor-pointer" />
-                    <label className="text-sm font-semibold text-gray-900 dark:text-white cursor-pointer select-none">Enable AdSense Sitewide</label>
+              <div className="p-6 md:p-8 border border-blue-200 dark:border-blue-500/20 bg-blue-50/30 dark:bg-blue-500/5 rounded-3xl">
+                <h3 className="font-black text-blue-900 dark:text-blue-100 mb-6 flex items-center gap-4 uppercase tracking-widest text-xs"><Code size={20}/> Google AdSense</h3>
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4 bg-white/60 dark:bg-black/40 p-4 rounded-xl border border-blue-200 dark:border-blue-500/10">
+                    <input type="checkbox" name="adsenseEnabled" checked={formData.adsenseEnabled} onChange={handleChange} className="w-6 h-6 accent-blue-600 rounded-lg cursor-pointer" />
+                    <label className="text-sm font-black text-gray-900 dark:text-white cursor-pointer select-none">Enable AdSense Sitewide Activation</label>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-blue-700 dark:text-blue-300 uppercase tracking-widest mb-1.5">Publisher ID</label>
-                    <input type="text" name="googleAdSensePublisherId" placeholder="pub-XXXXXXXXXXXXXXXX" value={formData.googleAdSensePublisherId} onChange={handleChange} className="w-full font-mono text-sm bg-white dark:bg-[#050505] border border-blue-200 dark:border-blue-500/20 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-blue-500 transition-colors" />
+                    <label className="block text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-[0.2em] mb-2">Publisher ID</label>
+                    <input type="text" name="googleAdSensePublisherId" placeholder="pub-XXXXXXXXXXXXXXXX" value={formData.googleAdSensePublisherId} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-blue-200 dark:border-blue-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-blue-500 transition-all font-bold" />
                   </div>
                 </div>
               </div>
@@ -212,47 +244,69 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Rec
           )}
 
           {activeTab === "ai" && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-6 flex items-center gap-3"><Bot size={24} className="text-purple-500"/> AI Engine Configuration</h2>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-12">
+              <div className="border-b border-gray-100 dark:border-white/5 pb-6">
+                <h2 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3 leading-tight"><Bot size={28} className="text-purple-500"/> Neural Engine Orchestrator</h2>
+                <p className="text-gray-500 dark:text-white/40 text-sm font-bold mt-2 ml-[40px]">Configure LLM endpoints and autonomous fallback logic.</p>
+              </div>
               
-              <div className="space-y-6 max-w-xl">
-                {/* Claude Integration (PRIMARY) */}
-                <div className="p-6 border border-orange-200 dark:border-orange-500/20 bg-orange-50 dark:bg-orange-500/5 rounded-2xl">
-                  <h3 className="font-bold text-orange-900 dark:text-orange-100 mb-4 flex items-center gap-2"><Bot size={18}/> Claude AI (Primary Engine)</h3>
-                  <div className="space-y-5">
-                    <div className="flex items-center gap-3 bg-white/50 dark:bg-black/30 p-3 rounded-xl border border-orange-200 dark:border-orange-500/10">
-                      <input type="checkbox" name="claudeEnabled" checked={formData.claudeEnabled} onChange={handleChange} className="w-5 h-5 accent-orange-600 rounded cursor-pointer" />
-                      <label className="text-sm font-semibold text-gray-900 dark:text-white cursor-pointer select-none">Enable Claude Orchestrator (Priority)</label>
+              <div className="space-y-10">
+                {/* Google Gemini (PRIMARY) */}
+                <div className="p-6 md:p-8 border border-blue-200 dark:border-blue-500/20 bg-blue-50/30 dark:bg-blue-500/5 rounded-3xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 px-4 py-1 bg-blue-500 text-white text-[8px] font-black uppercase tracking-widest rounded-bl-xl shadow-lg">Primary Engine</div>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+                    <h3 className="font-black text-blue-900 dark:text-blue-100 flex items-center gap-4 uppercase tracking-widest text-xs"><Bot size={20}/> Google Gemini Pro</h3>
+                    <div className="flex items-center gap-3 bg-white/60 dark:bg-black/40 px-4 py-2 rounded-xl border border-blue-200 dark:border-blue-500/10">
+                      <input type="checkbox" name="gemini_enabled" checked={formData.gemini_enabled} onChange={handleChange} className="w-5 h-5 accent-blue-600 rounded cursor-pointer" />
+                      <label className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest">Active State</label>
                     </div>
+                  </div>
+                  <div className="space-y-6">
                     <div>
-                      <label className="block text-xs font-bold text-orange-700 dark:text-orange-300 uppercase tracking-widest mb-1.5">Claude API Key</label>
-                      <input type="password" name="claudeApiKey" placeholder="sk-ant-api03-••••••••••••••••" value={formData.claudeApiKey} onChange={handleChange} className="w-full font-mono text-sm bg-white dark:bg-[#050505] border border-orange-200 dark:border-orange-500/20 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-orange-500 transition-colors" />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-orange-700 dark:text-orange-300 uppercase tracking-widest mb-1.5">Generation Model</label>
-                      <select name="claudeModel" value={formData.claudeModel} onChange={handleChange} className="w-full bg-white dark:bg-[#050505] border border-orange-200 dark:border-orange-500/20 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-orange-500 transition-colors">
-                        <option value="claude-3-opus-20240229">Claude 3 Opus (Most Intelligent)</option>
-                        <option value="claude-3-sonnet-20240229">Claude 3 Sonnet (Balanced)</option>
-                        <option value="claude-3-haiku-20240307">Claude 3 Haiku (Fastest / Default)</option>
-                      </select>
+                      <label className="block text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-[0.2em] mb-2">Gemini API Key</label>
+                      <input type="password" name="gemini_api_key" placeholder="AIzaSy•••••••••••••••••••••••••••••" value={formData.gemini_api_key} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-blue-200 dark:border-blue-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-blue-500 transition-all font-bold" />
                     </div>
                   </div>
                 </div>
 
-                {/* Legacy / Fallback Engines */}
-                <div className="pt-4 border-t border-gray-200 dark:border-white/10">
-                  <h3 className="font-bold text-gray-700 dark:text-gray-300 mb-4">Fallback Engines (Gemini & ChatGPT)</h3>
-                  <div className="space-y-5">
+                {/* OpenAI (SECONDARY FALLBACK) */}
+                <div className="p-6 md:p-8 border border-emerald-200 dark:border-emerald-500/20 bg-emerald-50/30 dark:bg-emerald-500/5 rounded-3xl">
+                   <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+                    <h3 className="font-black text-emerald-900 dark:text-emerald-100 flex items-center gap-4 uppercase tracking-widest text-xs"><Activity size={20}/> OpenAI GPT-4 Turbo</h3>
+                    <div className="flex items-center gap-3 bg-white/60 dark:bg-black/40 px-4 py-2 rounded-xl border border-emerald-200 dark:border-emerald-500/10">
+                      <input type="checkbox" name="openai_enabled" checked={formData.openai_enabled} onChange={handleChange} className="w-5 h-5 accent-emerald-600 rounded cursor-pointer" />
+                      <label className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest">Fallback Active</label>
+                    </div>
+                  </div>
+                  <div className="space-y-6">
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1.5">Fallback Provider Format</label>
-                      <select name="aiProvider" value={formData.aiProvider} onChange={handleChange} className="w-full bg-gray-50 dark:bg-[#050505] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-cyan-500 transition-colors">
-                        <option value="gemini">Google Gemini (Default Fallback)</option>
-                        <option value="openai">OpenAI ChatGPT</option>
-                      </select>
+                      <label className="block text-[10px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-[0.2em] mb-2">OpenAI API Key</label>
+                      <input type="password" name="openai_api_key" placeholder="sk-••••••••••••••••••••••••••••••••" value={formData.openai_api_key} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-emerald-200 dark:border-emerald-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-emerald-500 transition-all font-bold" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Claude Integration (FINAL FALLBACK) */}
+                <div className="p-6 md:p-8 border border-orange-200 dark:border-orange-500/20 bg-orange-50/30 dark:bg-orange-500/5 rounded-3xl">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+                    <h3 className="font-black text-orange-900 dark:text-orange-100 flex items-center gap-4 uppercase tracking-widest text-xs"><Bot size={20}/> Anthropic Claude (Final Fallback)</h3>
+                    <div className="flex items-center gap-3 bg-white/60 dark:bg-black/40 px-4 py-2 rounded-xl border border-orange-200 dark:border-orange-500/10">
+                      <input type="checkbox" name="claudeEnabled" checked={formData.claudeEnabled} onChange={handleChange} className="w-5 h-5 accent-orange-600 rounded cursor-pointer" />
+                      <label className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest">Active State</label>
+                    </div>
+                  </div>
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-[10px] font-black text-orange-700 dark:text-orange-400 uppercase tracking-[0.2em] mb-2">Claude API Key</label>
+                      <input type="password" name="claudeApiKey" placeholder="sk-ant-api03-••••••••••••••••" value={formData.claudeApiKey} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-orange-200 dark:border-orange-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-orange-500 transition-all font-bold" />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1.5">Fallback API Key</label>
-                      <input type="password" name="aiApiKey" placeholder="•••••••••••••••••••••••••••••" value={formData.aiApiKey} onChange={handleChange} className="w-full font-mono text-sm bg-gray-50 dark:bg-[#050505] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-cyan-500 transition-colors" />
+                      <label className="block text-[10px] font-black text-orange-700 dark:text-orange-400 uppercase tracking-[0.2em] mb-2">Intelligence Model Selection</label>
+                      <select name="claudeModel" value={formData.claudeModel} onChange={handleChange} className="w-full bg-white dark:bg-black/40 border border-orange-200 dark:border-orange-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-orange-500 transition-all font-bold text-xs uppercase tracking-widest">
+                        <option value="claude-3-opus-20240229">Claude 3 Opus (Most Intelligent)</option>
+                        <option value="claude-Sonnet-20240229">Claude 3 Sonnet (Balanced)</option>
+                        <option value="claude-3-haiku-20240307">Claude 3 Haiku (Fastest / Default)</option>
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -261,30 +315,47 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Rec
           )}
 
           {activeTab === "social" && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-6 flex items-center gap-3"><Twitter size={24} className="text-purple-500"/> Social Automation (X)</h2>
-              <div className="space-y-5 max-w-xl">
-                <div className="flex items-center gap-3 mb-6 p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
-                  <input type="checkbox" name="xAutoThread" checked={formData.xAutoThread} onChange={handleChange} className="w-5 h-5 accent-black dark:accent-white rounded cursor-pointer" />
-                  <label className="text-sm font-semibold text-gray-900 dark:text-white cursor-pointer select-none">Enable Automatic Neural Thread Posting on new AI Articles</label>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-10">
+              <div className="border-b border-gray-100 dark:border-white/5 pb-6">
+                <h2 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3 leading-tight"><Twitter size={28} className="text-purple-500"/> Neural Thread Automation (X)</h2>
+                <p className="text-gray-500 dark:text-white/40 text-sm font-bold mt-2 ml-[40px]">Configure social signals and auto-posting logic.</p>
+              </div>
+              <div className="space-y-6">
+                <div className="flex items-center gap-4 p-5 rounded-2xl bg-gray-50 dark:bg-white/[0.02] border border-gray-200 dark:border-white/10">
+                  <input type="checkbox" name="xAutoThread" checked={formData.xAutoThread} onChange={handleChange} className="w-6 h-6 accent-black dark:accent-white rounded-lg cursor-pointer" />
+                  <label className="text-sm font-black text-gray-900 dark:text-white cursor-pointer select-none">Enable Automatic Thread Synthesis on new AI Vectors</label>
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1.5">X API Key</label>
-                  <input type="password" name="xApiKey" placeholder="••••••••••••••••••" value={formData.xApiKey} onChange={handleChange} className="w-full font-mono text-sm bg-gray-50 dark:bg-[#050505] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-purple-500" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1.5">X API Secret</label>
-                  <input type="password" name="xApiSecret" placeholder="••••••••••••••••••" value={formData.xApiSecret} onChange={handleChange} className="w-full font-mono text-sm bg-gray-50 dark:bg-[#050505] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-purple-500" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1.5">X Access Token</label>
-                  <input type="password" name="xAccessToken" placeholder="••••••••••••••••••" value={formData.xAccessToken} onChange={handleChange} className="w-full font-mono text-sm bg-gray-50 dark:bg-[#050505] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:border-purple-500" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-2">X API Key</label>
+                    <input type="password" name="xApiKey" placeholder="••••••••••••••••••" value={formData.xApiKey} onChange={handleChange} className="w-full font-mono text-sm bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-2">X API Secret</label>
+                    <input type="password" name="xApiSecret" placeholder="••••••••••••••••••" value={formData.xApiSecret} onChange={handleChange} className="w-full font-mono text-sm bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-2">X Access Token</label>
+                    <input type="password" name="xAccessToken" placeholder="••••••••••••••••••" value={formData.xAccessToken} onChange={handleChange} className="w-full font-mono text-sm bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all" />
+                  </div>
                 </div>
               </div>
             </motion.div>
           )}
         </div>
       </GlassCard>
+
+      {/* Mobile Sticky Save Button */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/80 dark:bg-[#050505]/80 backdrop-blur-2xl border-t border-gray-200 dark:border-white/5 z-[100] shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+        <button 
+          onClick={handleSave}
+          disabled={isSaving}
+          className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black py-4 rounded-xl shadow-xl shadow-purple-500/20 active:scale-[0.98] transition-all disabled:opacity-50 text-sm uppercase tracking-widest"
+        >
+          {isSaving ? <Activity className="animate-spin" size={20} /> : <Save size={20} />}
+          {isSaving ? "Deploying Configuration..." : "Save Config & Sync"}
+        </button>
+      </div>
     </div>
   );
 }

@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
-
-const anthropic = new Anthropic({
-  apiKey: process.env.CLAUDE_API_KEY || "",
-});
+import { checkAdminAuth } from "@/lib/auth";
+import { generateContent } from "@/lib/ai";
 
 export async function POST(request: Request) {
   try {
+    const isAuthorized = await checkAdminAuth(request);
+    if (!isAuthorized) {
+      return NextResponse.json({ error: "Unauthorized access. Admin privileges required." }, { status: 401 });
+    }
     const { content, url } = await request.json();
 
     if (!content) {
@@ -34,20 +35,7 @@ BLOG CONTENT TO SUMMARIZE:
 ${content.substring(0, 3000)}... (truncated for length)
 `;
 
-    const msg = await anthropic.messages.create({
-      model: "claude-3-haiku-20240307",
-      max_tokens: 500,
-      temperature: 0.7,
-      system: "You are an API that outputs strictly JSON. Do not output anything other than parsable JSON.",
-      messages: [
-        { role: "user", content: prompt }
-      ]
-    });
-
-    const outputText = msg.content[0].type === "text" ? msg.content[0].text : "";
-    
-    const cleanJsonText = outputText.replace(/^```json\n?/, '').replace(/```$/, '').trim();
-    const result = JSON.parse(cleanJsonText);
+    const result = await generateContent(prompt);
 
     return NextResponse.json(result);
   } catch (error: any) {

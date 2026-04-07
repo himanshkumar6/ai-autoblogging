@@ -47,9 +47,14 @@ export default async function DashboardLayout({
       <AdminSidebar userEmail={safeUser?.email || ""} />
 
       {/* 4. Main Content Area */}
-      {/* Lg:ml-64 creates the required space for the fixed sidebar */}
-      <main className="lg:ml-64 flex-1 min-h-screen relative pt-16 lg:pt-0">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-10 pb-20">
+      {/* 
+          Responsive Margin Rules:
+          - ml-0 (Mobile): Overlay sidebar
+          - md:ml-20 (Tablet): Compact icon sidebar
+          - lg:ml-64 (Desktop): Full sidebar
+      */}
+      <main className="flex-1 min-h-screen relative transition-all duration-500 ease-in-out ml-0 md:ml-20 lg:ml-64 pt-16 md:pt-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
           {children}
         </div>
       </main>

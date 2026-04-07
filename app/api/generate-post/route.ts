@@ -1,25 +1,10 @@
-export const dynamic = "force-dynamic";
-
 import { NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
-import { createClient } from "@/lib/supabase/server";
-
-const anthropic = new Anthropic({
-  apiKey: process.env.CLAUDE_API_KEY || "",
-});
+import { checkAdminAuth } from "@/lib/auth";
+import { generateContent } from "@/lib/ai";
 
 export async function POST(request: Request) {
   try {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    // Whitelist check (same as middleware)
-    const ADMIN_EMAILS = [
-      "admin@cryptonews.local", 
-      process.env.ADMIN_EMAIL || ""
-    ].filter(Boolean);
-
-    const isAuthorized = user && ADMIN_EMAILS.includes(user.email || "");
+    const isAuthorized = await checkAdminAuth(request);
 
     if (!isAuthorized) {
       return NextResponse.json({ error: "Unauthorized access. Admin privileges required." }, { status: 401 });
@@ -43,21 +28,7 @@ Your output MUST be strictly valid JSON matching this schema:
 
 Do not include any extra text before or after the JSON. Provide only valid JSON. Ensure the content uses headings, bullet points, and simple English.`;
 
-    const msg = await anthropic.messages.create({
-      model: "claude-3-haiku-20240307",
-      max_tokens: 4000,
-      temperature: 0.7,
-      system: "You are an API that outputs strictly JSON. Do not output anything other than parsable JSON.",
-      messages: [
-        { role: "user", content: prompt }
-      ]
-    });
-
-    const outputText = msg.content[0].type === "text" ? msg.content[0].text : "";
-    
-    // Parse the JSON. Claude might wrap it in markdown codeblocks if it ignores the prompt, so cleanup just in case.
-    const cleanJsonText = outputText.replace(/^```json\n?/, '').replace(/```$/, '').trim();
-    const result = JSON.parse(cleanJsonText);
+    const result = await generateContent(prompt);
 
     return NextResponse.json(result);
   } catch (error: any) {

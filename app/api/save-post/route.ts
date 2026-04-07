@@ -1,8 +1,8 @@
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { checkAdminAuth } from "@/lib/auth";
 
 function generateSlug(title: string) {
   return title
@@ -15,20 +15,13 @@ function generateSlug(title: string) {
 
 export async function POST(request: Request) {
   try {
-    // Auth check — only logged-in admin can save posts
-    const supabase = createClient();
-    const supabaseAdmin = getSupabaseAdmin();
-    const { data: { user } } = await supabase.auth.getUser();
+    const isAuthorized = await checkAdminAuth(request);
 
-    const ADMIN_EMAILS = [
-      "admin@cryptonews.local",
-      process.env.ADMIN_EMAIL || "",
-    ].filter(Boolean);
-
-    const isAuthorized = user && ADMIN_EMAILS.includes(user.email || "");
     if (!isAuthorized) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized access. Admin privileges required." }, { status: 401 });
     }
+
+    const supabaseAdmin = getSupabaseAdmin();
 
     const { title, content, meta, published = true } = await request.json();
 

@@ -13,7 +13,7 @@ export default function Sidebar({ trendingPosts = [] }: SidebarProps) {
   const displayPosts = trendingPosts.length > 0 ? trendingPosts : [];
 
   return (
-    <aside className="hidden lg:flex w-[350px] flex-shrink-0 flex-col gap-6 sticky top-28 h-max pb-8 z-10">
+    <aside className="flex w-full lg:w-[350px] flex-shrink-0 flex-col gap-6 lg:sticky lg:top-28 h-max pb-8 z-10">
       
       {/* Trending Widget */}
       <GlassCard

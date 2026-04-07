@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 function generateSlug(title: string) {
   return title
@@ -17,6 +17,7 @@ export async function POST(request: Request) {
   try {
     // Auth check — only logged-in admin can save posts
     const supabase = createClient();
+    const supabaseAdmin = getSupabaseAdmin();
     const { data: { user } } = await supabase.auth.getUser();
 
     const ADMIN_EMAILS = [

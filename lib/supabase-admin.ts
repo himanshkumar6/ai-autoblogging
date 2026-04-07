@@ -1,27 +1,27 @@
 import { createClient } from '@supabase/supabase-js'
 
 /**
- * Service-role Supabase client generator for backend/server-side operations.
- * This bypasses Row Level Security (RLS) and has full DB access.
+ * Build-safe Admim Supabase Client Getter
+ * 
+ * Ensures process.env is only accessed at runtime and prevents
+ * build-time crashes if SUPABASE_SERVICE_ROLE_KEY is missing during static analysis.
  */
 export function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!url || !key) {
-    // Return a proxy or dummy client during build time if env is missing
-    // or just let it fail at runtime.
     if (process.env.NODE_ENV === 'production' && !key) {
-      console.warn("SUPABASE_SERVICE_ROLE_KEY is missing. Admin operations will fail.");
+      throw new Error("SUPABASE_SERVICE_ROLE_KEY is missing. Admin operations will fail.")
     }
+    // Return a dummy client during build time if env is missing
+    return createClient(url || 'https://placeholder.supabase.co', key || 'placeholder')
   }
 
-  return createClient(url!, key!);
+  return createClient(url, key)
 }
 
-// Keep the export for compatibility but it should be avoided if possible. 
-// Preferred way is calling getSupabaseAdmin() inside handlers.
-export const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-);
+// Deprecated: Use getSupabaseAdmin() instead.
+export const supabaseAdmin = (process.env.SUPABASE_SERVICE_ROLE_KEY) 
+  ? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || '', process.env.SUPABASE_SERVICE_ROLE_KEY || '')
+  : null as any;

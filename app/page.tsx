@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import Container from "@/components/Container";
 import BlogCard from "@/components/BlogCard";
 import Sidebar from "@/components/Sidebar";
@@ -7,6 +7,7 @@ import HeroButtons from "@/components/HeroButtons";
 export const revalidate = 60; // Refresh page data every 60 seconds
 
 export default async function Home() {
+  const supabase = getSupabase();
   const { data: posts, error } = await supabase
     .from("posts")
     .select("id, title, slug, meta_description, created_at, tweeted")

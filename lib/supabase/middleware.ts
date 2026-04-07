@@ -23,16 +23,13 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.get(name)?.value;
         },
         set(name: string, value: string, options: CookieOptions) {
+          // Update request cookies for downstream use
           request.cookies.set({
             name,
             value,
             ...options,
           });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
+          // Synchronize with response object to ensure cookies are sent back to browser
           response.cookies.set({
             name,
             value,
@@ -40,16 +37,13 @@ export async function updateSession(request: NextRequest) {
           });
         },
         remove(name: string, options: CookieOptions) {
+          // Update request cookies for downstream use
           request.cookies.set({
             name,
             value: "",
             ...options,
           });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
+          // Synchronize with response object
           response.cookies.set({
             name,
             value: "",
@@ -60,37 +54,44 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
+  // Use getUser() as it is more secure than getSession() for server-side checks.
+  // It validates the session with the Supabase Auth server.
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser();
 
-  const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
-  const isLoginRoute = request.nextUrl.pathname === "/admin/login";
+  const pathname = request.nextUrl.pathname;
+  const isAdminRoute = pathname.startsWith("/admin");
+  const isLoginRoute = pathname === "/admin/login";
 
+  // CRITICAL: Logic to prevent loops and handle authorized access
   if (isAdminRoute) {
-    if (!user) {
+    if (!user || error) {
+      // Not authenticated -> Redirect to login (unless already there)
       if (!isLoginRoute) {
-        // Not logged in -> redirect to login
         const url = request.nextUrl.clone();
         url.pathname = "/admin/login";
+        // Ensure we don't carry over search params that might cause loops
+        url.search = ""; 
         return NextResponse.redirect(url);
       }
     } else {
-      // User is logged in
-      const isAuthorizedAdmin = ADMIN_EMAILS.includes(user.email || "");
+      // Authenticated -> Check authorization
+      const userEmail = typeof user === 'object' && user !== null ? user.email : null;
+      const isAuthorizedAdmin = userEmail && ADMIN_EMAILS.includes(userEmail);
 
       if (!isAuthorizedAdmin) {
-        // Logged in but not an admin -> show a simple access denied or home
-        // We can just redirect them to home, or a dedicated /access-denied
-        if (!request.nextUrl.pathname.startsWith("/access-denied")) {
+        // Logged in but NOT an authorized admin
+        if (!pathname.startsWith("/access-denied")) {
           const url = request.nextUrl.clone();
           url.pathname = "/access-denied";
           return NextResponse.redirect(url);
         }
       } else {
-        // Valid Admin
+        // Logged in and IS an authorized admin
         if (isLoginRoute) {
-          // Already logged in, no need to be on login page
+          // Already logged in, redirect away from login to dashboard
           const url = request.nextUrl.clone();
           url.pathname = "/admin";
           return NextResponse.redirect(url);
@@ -101,3 +102,4 @@ export async function updateSession(request: NextRequest) {
 
   return response;
 }
+

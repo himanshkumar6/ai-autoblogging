@@ -1,7 +1,8 @@
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
+import { headers } from "next/headers";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 const topics = [
   "Bitcoin price prediction",
@@ -23,11 +24,15 @@ function generateSlug(title: string) {
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function GET(request: Request) {
-  // We use GET for cron jobs usually, but Vercel Cron sends GET requests.
+  // Defensive de-optimization for cron routes
+  headers(); 
+  
+  const supabase = getSupabaseAdmin();
+
   try {
     // 1. Pick a random topic
     const topic = topics[Math.floor(Math.random() * topics.length)];
-    const baseUrl = new URL(request.url).origin;
+    const { origin: baseUrl } = new URL(request.url);
 
     // 2. Generate Blog Post
     console.log(`[Auto-Run] Generating post for topic: ${topic}`);
@@ -56,8 +61,6 @@ export async function GET(request: Request) {
     // 3. Save to Supabase
     console.log(`[Auto-Run] Saving post to DB with slug: ${slug}`);
 
-    // Ensure slug doesn't conflict by adding random string if exists
-    // (For MVP, just append date if conflict is found, but let's try direct insert first)
     const { data: insertedPost, error: insertError } = await supabase
       .from("posts")
       .insert([
@@ -74,7 +77,6 @@ export async function GET(request: Request) {
     if (insertError) {
       // Very basic duplicate handling: append random numbers
       if (insertError.code === "23505") {
-        // Unique violation
         const newSlug = `${slug}-${Math.floor(Math.random() * 10000)}`;
         const { error: retryError } = await supabase
           .from("posts")
@@ -117,7 +119,6 @@ export async function GET(request: Request) {
       if (!xResponse.ok) {
         const errorText = await xResponse.text();
         console.error(`[Auto-Run] Failed to post to X: ${errorText}`);
-        // We do not throw here so we don't crash the whole cron if only twitter fails.
       } else {
         // Update DB tweeted status
         console.log(`[Auto-Run] Tweet posted successfully. Updating DB.`);

@@ -21,10 +21,9 @@ export default async function DashboardLayout({
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Guard: Redirect to login if unauthenticated
-  if (!user) {
-    redirect("/admin/login");
-  }
+  // Redirects are handled by middleware.
+  const safeUser = typeof user === 'object' && user !== null ? user : null;
+
 
   return (
     <div className="min-h-screen bg-[#050505] text-white selection:bg-purple-500/30">
@@ -43,7 +42,7 @@ export default async function DashboardLayout({
       <ParticleBackground />
 
       {/* 3. Fixed Sidebar Component */}
-      <AdminSidebar userEmail={user.email!} />
+      <AdminSidebar userEmail={safeUser?.email || ""} />
 
       {/* 4. Main Content Area */}
       {/* Lg:ml-64 creates the required space for the fixed sidebar */}

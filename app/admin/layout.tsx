@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { createClient } from "@/lib/supabase/server";
 import AdminSidebar from "@/components/AdminSidebar";
 import ParticleBackground from "@/components/ParticleBackground";
@@ -18,10 +20,10 @@ export default async function AdminRootLayout({
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Guard: Redirect to login if unauthenticated
-  if (!user) {
-    redirect("/admin/login");
-  }
+  // Middleware handles all redirects for /admin and /admin/login.
+  // We only fetch the user here for the Sidebar and other UI components.
+  const safeUser = typeof user === 'object' && user !== null ? user : null;
+
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#050505] text-gray-900 dark:text-white transition-colors duration-500 selection:bg-purple-500/30">
@@ -43,7 +45,7 @@ export default async function AdminRootLayout({
       <ParticleBackground />
 
       {/* 3. Fixed Sidebar Component */}
-      <AdminSidebar userEmail={user.email!} />
+      <AdminSidebar userEmail={safeUser?.email || ""} />
 
       {/* 4. Main Content Area */}
       <main className="lg:ml-64 flex-1 min-h-screen relative pt-20 lg:pt-0">

@@ -92,7 +92,7 @@ export default function AdminSidebar({ userEmail }: { userEmail: string }) {
 
       {/* Sidebar Desktop & Mobile Drawer */}
       <AnimatePresence>
-        {(isOpen || (typeof window !== 'undefined' && window.innerWidth >= 1024)) && (
+        {(isOpen || (mounted && window.innerWidth >= 1024)) && (
           <motion.aside 
             initial={{ x: -256 }}
             animate={{ x: 0 }}

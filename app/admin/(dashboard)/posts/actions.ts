@@ -32,8 +32,9 @@ export async function deletePost(id: string) {
 
     if (error) throw error;
 
-    console.log(`[Admin Actions] Deleted post: ${id}`);
     revalidatePath("/admin/posts");
+    revalidatePath("/");
+    revalidatePath("/blog/[slug]", "layout");
     return { success: true };
   } catch (error: any) {
     console.error(`[Admin Actions] Delete failed: ${error.message}`);
@@ -77,8 +78,9 @@ export async function updatePost(id: string, formData: { title: string; meta_des
 
     if (error) throw error;
 
-    console.log(`[Admin Actions] Updated post: ${id}`);
     revalidatePath("/admin/posts");
+    revalidatePath("/");
+    revalidatePath("/blog/[slug]", "layout");
     revalidatePath(`/admin/posts/${id}/edit`);
     return { success: true, post: data };
   } catch (error: any) {

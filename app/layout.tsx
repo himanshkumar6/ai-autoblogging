@@ -1,6 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display, PT_Serif } from "next/font/google";
 import { Providers } from "./providers";
 import LayoutWrapper from "@/components/LayoutWrapper";
 import GlobalLoader from "@/components/GlobalLoader";
@@ -8,7 +8,9 @@ import GlobalLoader from "@/components/GlobalLoader";
 import { getAllSettings } from "@/app/actions/settings";
 import Script from "next/script";
 
-const inter = Inter({ subsets: ["latin"], display: "swap" });
+const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });
+const playfair = Playfair_Display({ subsets: ["latin"], display: "swap", variable: "--font-playfair" });
+const ptSerif = PT_Serif({ subsets: ["latin"], weight: ["400", "700"], display: "swap", variable: "--font-pt-serif" });
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getAllSettings();
@@ -35,7 +37,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
-      <body className={`${inter.className} min-h-screen antialiased selection:bg-accent-blue selection:text-white flex flex-col relative`}>
+      <body className={`${inter.variable} ${playfair.variable} ${ptSerif.variable} font-sans min-h-screen antialiased selection:bg-accent-blue selection:text-white flex flex-col relative`}>
         {/* Google Analytics 4 Injection */}
         {settings.ga4Id && (
           <>

@@ -72,73 +72,76 @@ export default async function BlogPostPage({ params }: Props) {
           </Link>
         </div>
 
-        <GlassCard className="p-6 md:p-12 border-t border-b sm:border-r sm:border-l border-black/10 dark:border-white/10 !bg-white/70 dark:!bg-[#15151f]/60 backdrop-blur-3xl shadow-xl shadow-black/5 dark:shadow-black/50">
+        <GlassCard className="p-8 md:p-16 border-t border-b sm:border border-black/5 dark:border-white/5 !bg-white/40 dark:!bg-[#0a0a0f]/40 backdrop-blur-3xl shadow-2xl">
           
           {/* Article Header */}
-          <header className="mb-12">
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-secondary font-medium mb-8">
-              <span className="px-3 py-1 rounded-full bg-accent-blue/10 dark:bg-accent-blue/20 text-accent-blue dark:text-blue-300 border border-accent-blue/20">
+          <header className="mb-16 flex flex-col items-center text-center">
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-3 text-[11px] font-black uppercase tracking-[0.2em] mb-10">
+              <span className="px-3 py-1.5 rounded-lg bg-accent-cyan/10 text-accent-cyan border border-accent-cyan/20">
                 Market Intel
               </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-700" />
-              <time dateTime={post.created_at}>
+              <span className="text-gray-300 dark:text-white/20">/</span>
+              <time dateTime={post.created_at} className="text-gray-500 dark:text-white/40">
                 {new Date(post.created_at).toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
                   year: "numeric"
                 })}
               </time>
-              <span className="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-700" />
-              <span className="flex items-center tracking-wide text-accent-cyan">
+              <span className="text-gray-300 dark:text-white/20">/</span>
+              <span className="text-accent-blue dark:text-accent-purple">
                 {readTime} min read
               </span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl font-black text-primary tracking-tight leading-[1.15] mb-6 text-balance drop-shadow-sm">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-display font-black text-gray-900 dark:text-white tracking-tighter leading-[0.95] mb-10 text-balance text-center mx-auto max-w-4xl">
               {post.title}
             </h1>
             
-            <p className="text-xl text-secondary leading-relaxed mb-10 font-medium">
+            <p className="text-xl sm:text-2xl text-gray-500 dark:text-white/40 italic leading-relaxed mb-12 font-body font-medium tracking-tight text-center mx-auto max-w-2xl">
               {post.meta_description}
             </p>
 
             {/* Author Block */}
-            <div className="flex items-center justify-between py-6 border-t border-b border-black/10 dark:border-white/10">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-accent-cyan via-accent-blue to-accent-purple flex items-center justify-center shadow-lg shadow-accent-blue/20">
-                  <span className="text-white font-black text-lg">AI</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between py-10 border-t border-b border-black/5 dark:border-white/5 gap-8">
+              <div className="flex items-center gap-5">
+                <div className="w-16 h-16 rounded-2xl bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 p-0.5 flex items-center justify-center shadow-xl">
+                   <div className="w-full h-full rounded-[14px] bg-gradient-to-br from-accent-cyan via-accent-blue to-accent-purple flex items-center justify-center">
+                    <span className="text-white font-display font-black text-xl tracking-tighter">Ai</span>
+                   </div>
                 </div>
                 <div>
-                  <p className="text-base font-bold text-primary leading-none mb-1">Cyber Analyst Model</p>
-                  <p className="text-sm text-secondary font-medium tracking-wide">Autonomous Engine</p>
+                  <p className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest leading-none mb-2 flex items-center gap-2">
+                    Cyber Analyst Model
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-white/30 font-bold tracking-widest uppercase font-display">Autonomous Intelligence Engine</p>
                 </div>
               </div>
 
               {/* Share Buttons */}
-              <div className="flex items-center gap-3">
-                <button className="p-2.5 rounded-xl bg-black/5 dark:bg-white/5 text-secondary hover:text-white hover:bg-[#1DA1F2] hover:shadow-lg hover:shadow-[#1DA1F2]/30 transition-all duration-300 active:scale-95" aria-label="Share on X" title="Share on X">
-                  <Twitter size={18} />
+              <div className="flex items-center gap-2">
+                <button className="flex items-center gap-2 px-5 py-3 rounded-xl bg-black/5 dark:bg-white/5 text-gray-500 dark:text-white/40 hover:text-white hover:bg-black dark:hover:bg-white dark:hover:text-black transition-all font-black text-[10px] uppercase tracking-widest border border-transparent hover:border-white/10" aria-label="Share on X">
+                  <Twitter size={14} />
+                  Share
                 </button>
-                <button className="p-2.5 rounded-xl bg-black/5 dark:bg-white/5 text-secondary hover:text-white hover:bg-[#0077b5] hover:shadow-lg hover:shadow-[#0077b5]/30 transition-all duration-300 active:scale-95 hidden sm:block" aria-label="Share on LinkedIn" title="Share on LinkedIn">
-                  <Linkedin size={18} />
-                </button>
-                <div className="w-px h-6 bg-black/10 dark:bg-white/10 mx-1 hidden sm:block" />
-                <button className="p-2.5 rounded-xl bg-black/5 dark:bg-white/5 text-secondary hover:text-primary dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 transition-all duration-300 active:scale-95" aria-label="Copy Link" title="Copy Link">
-                  <LinkIcon size={18} />
+                <button className="p-3 rounded-xl bg-black/5 dark:bg-white/5 text-gray-500 dark:text-white/40 hover:text-white hover:bg-black dark:hover:bg-white dark:hover:text-black transition-all border border-transparent hover:border-white/10" aria-label="Copy Link">
+                  <LinkIcon size={14} />
                 </button>
               </div>
             </div>
           </header>
 
           {/* Article Body Content */}
-          {/* We ensure high readability by modifying prose colors */}
           <div 
-            className="prose prose-lg sm:prose-xl mx-auto dark:prose-invert 
-                       prose-headings:font-black prose-headings:tracking-tight 
-                       prose-a:text-accent-cyan hover:prose-a:text-accent-blue prose-a:no-underline hover:prose-a:underline
-                       prose-img:rounded-3xl prose-img:shadow-2xl prose-img:border prose-img:border-white/10
-                       prose-p:text-primary prose-strong:text-primary
-                       max-w-none leading-[1.85]"
+            className="prose prose-lg sm:prose-2xl mx-auto dark:prose-invert font-body
+                       prose-headings:font-display prose-headings:font-black prose-headings:tracking-tighter prose-headings:text-gray-900 dark:prose-headings:text-white
+                       prose-p:text-gray-800 dark:prose-p:text-white/70 prose-p:leading-[1.8]
+                       prose-strong:text-gray-900 dark:prose-strong:text-white
+                       prose-a:text-accent-cyan hover:prose-a:text-accent-blue prose-a:no-underline
+                       prose-img:rounded-[2.5rem] prose-img:shadow-2xl
+                       editorial-content
+                       max-w-none"
             dangerouslySetInnerHTML={{ __html: post.content }} 
           />
 

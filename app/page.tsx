@@ -10,7 +10,7 @@ export default async function Home() {
   const supabase = getSupabase();
   const { data: posts, error } = await supabase
     .from("posts")
-    .select("id, title, slug, meta_description, created_at, tweeted")
+    .select("id, title, slug, meta_description, content, created_at, tweeted")
     .eq("published", true)
     .order("created_at", { ascending: false });
 
@@ -21,22 +21,30 @@ export default async function Home() {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-24 pb-16 sm:pt-32 sm:pb-24">
-        {/* Glow behind hero text */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent-blue/20 dark:bg-accent-blue/10 blur-[100px] rounded-full point-events-none -z-10" />
-        
+      <section className="relative overflow-hidden pt-24 pb-12 sm:pt-32 sm:pb-20">
         <Container>
           <div className="max-w-4xl mx-auto text-center relative z-10">
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tighter text-primary mb-8 leading-[1.1]">
-              Crypto Insights <br className="hidden sm:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan via-accent-blue to-accent-purple drop-shadow-sm">
-                Powered by AI
+            {/* Live Status Indicator */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 mb-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-green-500">System Live: AI Nodes Active</span>
+            </div>
+
+            <h1 className="text-4xl sm:text-6xl lg:text-8xl font-black tracking-tighter text-gray-900 dark:text-white mb-8 leading-[0.95] drop-shadow-sm">
+              Crypto Intel <br className="hidden sm:block" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan via-accent-blue to-accent-purple">
+                Refined by AI
               </span>
             </h1>
-            <p className="mt-6 text-xl leading-relaxed text-secondary max-w-2xl mx-auto font-medium">
-              Enterprise-grade market analysis, on-chain data summaries, and breaking news algorithms running 24/7.
+            <p className="mt-8 text-lg sm:text-xl leading-relaxed text-gray-500 dark:text-white/40 max-w-2xl mx-auto font-bold tracking-tight">
+              Curated daily market analysis and on-chain breakthroughs, distilled into high-impact articles.
             </p>
-            <HeroButtons />
+            <div className="mt-12 flex justify-center scale-110 sm:scale-125">
+              <HeroButtons />
+            </div>
           </div>
         </Container>
       </section>

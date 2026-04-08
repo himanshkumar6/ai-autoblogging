@@ -1,70 +1,116 @@
 import { NextResponse } from "next/server";
-import { headers } from "next/headers";
 import { getTrendingTopic } from "@/lib/trending";
 import { generateBlog } from "@/lib/groq";
 import { generateImage } from "@/lib/image";
 import { createPost } from "@/lib/supabase-core";
 
+// 1. CORE CONFIGURATION (Vercel Production Constraints)
+export const dynamic = "force-dynamic";
+export const maxDuration = 300; // 5 minutes (Maximum for Vercel Pro, Hobby is 60s)
+export const runtime = "nodejs"; // Native Node.js runtime for complex AI processing
+
+/**
+ * PRODUCTION-READY AUTO-GENERATION ROUTE
+ * Handles Vercel Cron triggers and manual admin requests.
+ */
 export async function GET(request: Request) {
-  // MANDATORY TRIGGER LOG
-  console.log("=== AUTO GENERATE TRIGGERED ===");
-  
-  headers(); 
-  
-  // 0. Security Check (Development vs Production)
-  if (process.env.NODE_ENV === "production") {
+  const requestId = Math.random().toString(36).substring(7);
+  console.log(`[${requestId}] === STARTING AUTO-GENERATION PIPELINE ===`);
+
+  // 2. AUTHENTICATION SYSTEM
+  try {
     const authHeader = request.headers.get("authorization");
-    if (authHeader !== `Bearer ${process.env.ADMIN_TOKEN}`) {
-      console.warn("[Auto-Generate] Production Auth Failed: Missing or invalid Bearer token");
-      return NextResponse.json({ error: "Unauthorized access." }, { status: 401 });
+    const cronSecret = process.env.CRON_SECRET;
+    const adminToken = process.env.ADMIN_TOKEN;
+
+    const isCronTrigger = cronSecret && authHeader === `Bearer ${cronSecret}`;
+    const isAdminTrigger = adminToken && authHeader === `Bearer ${adminToken}`;
+
+    if (!isCronTrigger && !isAdminTrigger) {
+      console.warn(`[${requestId}] [Auth] Unauthorized access attempt blocked.`);
+      return NextResponse.json(
+        { error: "Unauthorized. Valid CRON_SECRET or ADMIN_TOKEN required." },
+        { status: 401 }
+      );
     }
-  } else {
-    console.log("[Auto-Generate] Running in Development mode: Auth check skipped");
+    console.log(`[${requestId}] [Auth] Verified: ${isCronTrigger ? "Vercel Cron" : "Admin/Manual"}`);
+  } catch (authError) {
+    console.error(`[${requestId}] [Auth Critical]`, authError);
+    return NextResponse.json({ error: "Authentication system failure" }, { status: 500 });
   }
 
-  try {
-    // 1. Get trending topic
-    const topic = await getTrendingTopic();
-    console.log(`[Auto-Generate] Topic Selected: ${topic}`);
+  // 3. SEGMENTED PIPELINE EXECUTION
+  let topic = "";
+  let blogData = null;
+  let finalImageUrl = "https://images.unsplash.com/photo-1518770660439-4636190af475"; // Default fallback
 
-    // 2. Generate blog using Groq
-    const postData = await generateBlog(topic);
-    
-    // 3. Generate Image (Stability Core v2beta)
-    const imageUrl = await generateImage(postData.image?.prompt);
-    
-    // SOURCE ATTRIBUTION
-    if (!imageUrl) {
-      console.warn("⚠️ FALLBACK IMAGE USED");
+  try {
+    // STEP 1: Trending Topic Discovery
+    console.log(`[${requestId}] [Step 1] Fetching trending topic...`);
+    topic = await getTrendingTopic();
+    if (!topic) throw new Error("Trending topic discovery returned empty result.");
+    console.log(`[${requestId}] [Step 1] Topic Selected: "${topic}"`);
+
+    // STEP 2: AI Blog Generation (Groq)
+    console.log(`[${requestId}] [Step 2] Generating blog via Groq...`);
+    blogData = await generateBlog(topic);
+    if (!blogData || !blogData.title) throw new Error("Groq failed to return valid blog structure.");
+    console.log(`[${requestId}] [Step 2] Blog Generated: "${blogData.title}"`);
+
+    // STEP 3: AI Image Generation (Stability AI with Fallback)
+    console.log(`[${requestId}] [Step 3] Generating cover image...`);
+    try {
+      const generatedImageUrl = await generateImage(blogData.image?.prompt || blogData.title);
+      if (generatedImageUrl) {
+        finalImageUrl = generatedImageUrl;
+        console.log(`[${requestId}] [Step 3] Image Generated Successfully.`);
+      } else {
+        console.warn(`[${requestId}] [Step 3] Image generation returned null. Using fallback.`);
+      }
+    } catch (imageError: any) {
+      console.error(`[${requestId}] [Step 3 Failure] Image pipeline crashed:`, imageError.message);
+      console.log(`[${requestId}] [Step 3] Falling back to default image to save the post.`);
     }
 
-    // FINAL AUDIT LOG
-    const fallbackImage = "https://images.unsplash.com/photo-1518770660439-4636190af475";
-    const finalImageUrl = imageUrl || fallbackImage;
-    
-    console.log("=== FINAL IMAGE URL ===");
-    console.log(finalImageUrl);
-
-    // 4. Save post with image_url (Atomic Guarantee)
-    const combinedData = {
-      ...postData,
+    // STEP 4: Database Persistence (Supabase)
+    console.log(`[${requestId}] [Step 4] Saving post to Supabase...`);
+    const postPayload = {
+      ...blogData,
       image_url: finalImageUrl,
-      published: true
+      published: true,
+      created_at: new Date().toISOString(),
     };
 
-    const savedPost = await createPost(combinedData);
+    const savedPost = await createPost(postPayload);
+    if (!savedPost) throw new Error("Database operation failed to return saved record.");
+    
+    console.log(`[${requestId}] === PIPELINE COMPLETED SUCCESSFULLY ===`);
+    console.log(`[${requestId}] Post Created: ${savedPost.slug}`);
 
-    // 5. Return full response
+    // 4. CLEAN SUCCESS RESPONSE
     return NextResponse.json({
       success: true,
-      data: savedPost
+      data: {
+        id: savedPost.id,
+        title: savedPost.title,
+        slug: savedPost.slug,
+        image_url: finalImageUrl
+      }
     });
 
-  } catch (error: any) {
-    console.error("[Auto-Generate Critical Failure]:", error.message);
-    return NextResponse.json({ 
-      error: error.message || "Failed to orchestrate pipeline",
-      status: "fail" 
+  } catch (pipelineError: any) {
+    // 5. GRANULAR FAILURE HANDLING
+    const failureSource = pipelineError.message.includes("Groq") ? "Groq" :
+                         pipelineError.message.includes("Database") ? "Supabase" :
+                         pipelineError.message.includes("Topic") ? "Trending Lib" : "Orchestrator";
+
+    console.error(`[${requestId}] [!] CRITICAL PIPELINE FAILURE at ${failureSource}:`, pipelineError.message);
+
+    return NextResponse.json({
+      success: false,
+      error: pipelineError.message,
+      source: failureSource,
+      requestId
     }, { status: 500 });
   }
 }

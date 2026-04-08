@@ -3,7 +3,7 @@ import Container from "@/components/Container";
 import BlogCard from "@/components/BlogCard";
 import Sidebar from "@/components/Sidebar";
 import HeroButtons from "@/components/HeroButtons";
-import AdUnit from "@/components/AdUnit";
+import AdRenderer from "@/components/AdRenderer";
 import { getAllSettings } from "./actions/settings";
 
 import Pagination from "@/components/Pagination";
@@ -43,6 +43,10 @@ export default async function Home({ searchParams }: Props) {
     console.error("Error fetching posts:", error);
   }
 
+  // Pre-configured Ad Codes from the user
+  const userNativeBanner = `<script async="async" data-cfasync="false" src="https://horizontallyresearchpolar.com/d352949af32948eb11532ac581006533/invoke.js"></script><div id="container-d352949af32948eb11532ac581006533"></div>`;
+  const userStandardBanner = `<script type="text/javascript">atOptions = {'key' : '5c6a2c2084c718a240683017260b60','format' : 'iframe','height' : 250,'width' : 300,'params' : {}};</script><script type="text/javascript" src="//www.highperformanceformat.com/5c6a2c2084c718a240683017260b60/invoke.js"></script>`;
+
   return (
     <>
       {/* Hero Section */}
@@ -70,33 +74,26 @@ export default async function Home({ searchParams }: Props) {
             <div className="mt-12 flex justify-center scale-110 sm:scale-125">
               <HeroButtons />
             </div>
+
+            {/* 1. TOP AD PLACEMENT: Below Buttons */}
+            <div className="ad-container mt-12 mb-4 w-full flex justify-center min-h-[90px]">
+              <AdRenderer adCode={settings.ads?.ad_top_banner || userNativeBanner} />
+            </div>
           </div>
         </Container>
       </section>
+      
+      {/* Removed old Top Banner Container */}
 
-      {/* Top Page Leaderboard - Responsive Slot */}
-      <Container className="mb-8">
-        {/* Desktop Leaderboard */}
-        {settings.adsterraLeaderboard && (
-          <div className="hidden md:flex justify-center py-4">
-            <AdUnit html={settings.adsterraLeaderboard} />
-          </div>
-        )}
-        {/* Mobile Banner */}
-        {settings.adsterraMobileBanner && (
-          <div className="flex md:hidden justify-center py-2">
-            <AdUnit html={settings.adsterraMobileBanner} />
-          </div>
-        )}
-      </Container>
+
 
       {/* Main Content Layout */}
       <Container className="pb-24 pt-8 text-black" >
-        <div className="flex flex-col lg:flex-row gap-12 relative z-10" id="latest-posts">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-12 relative z-10" id="latest-posts">
           
           {/* Main Feed */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-4 mb-10">
+          <div className="min-w-0 flex flex-col gap-6">
+            <div className="flex items-center gap-4 mb-4">
               <h2 className="text-3xl font-black tracking-tight text-primary dark:text-white">Market Feeds</h2>
               <div className="h-px flex-1 bg-gradient-to-r from-black/10 dark:from-white/10 to-transparent" />
             </div>
@@ -109,13 +106,7 @@ export default async function Home({ searchParams }: Props) {
                     index={i}
                     priority={i < 2}
                   />
-                  {/* Multi-slot Native Ad Injection */}
-                  {((i === 2 && settings.adsterraNative) || (i === 5 && settings.adsterraNative)) && (
-                    <div className="col-span-1 md:col-span-2 my-8 py-8 border-y border-black/5 dark:border-white/5 flex flex-col items-center gap-2">
-                       <span className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 dark:text-white/20">Sponsored</span>
-                       <AdUnit html={settings.adsterraNative} />
-                    </div>
-                  )}
+
                 </div>
               ))}
             </div>
@@ -129,13 +120,20 @@ export default async function Home({ searchParams }: Props) {
                 <Pagination currentPage={page} totalPages={totalPages} />
               </div>
             )}
+
+            {/* 3. BOTTOM AD PLACEMENT */}
+            <div className="ad-container mt-12 mb-8 flex justify-center w-full">
+              <AdRenderer adCode={settings.ads?.ad_bottom_banner} />
+            </div>
           </div>
 
-          <Sidebar 
-            trendingPosts={posts ? posts.slice(0, 4) : []} 
-            adSkyscraper={settings.adsterraSidebarSkyscraper}
-            adSquare={settings.adsterraSidebarSquare}
-          />
+          {/* Sidebar - Clean of ads */}
+          <div className="w-full lg:w-[300px]">
+            <Sidebar 
+              trendingPosts={posts ? posts.slice(0, 4) : []} 
+              adCode={settings.ads?.ad_mid_content || userStandardBanner}
+            />
+          </div>
         </div>
       </Container>
     </>

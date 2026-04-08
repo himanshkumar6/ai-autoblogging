@@ -74,7 +74,7 @@ export async function saveSettings(payload: Record<string, any>) {
       return { success: false, error: error.message };
     }
 
-    // Force Next.js router cache to clear globally so layouts load new ad codes/GA instantly
+    // Force Next.js router cache to clear globally so layouts load new settings/GA instantly
     revalidatePath("/", "layout");
     
     return { success: true };

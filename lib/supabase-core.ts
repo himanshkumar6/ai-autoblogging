@@ -1,11 +1,14 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
 /**
- * CLIENT-SIDE SUPABASE 
- * Build-safe Getter for public/client-side use.
+ * CLIENT-SIDE SUPABASE: Lazy-initialized singleton for public use
  * This ensuring process.env is only accessed at runtime.
  */
+let publicSupabase: SupabaseClient | null = null;
+
 export function getSupabase(): SupabaseClient {
+  if (publicSupabase) return publicSupabase;
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
@@ -17,7 +20,8 @@ export function getSupabase(): SupabaseClient {
     return createClient('https://placeholder.supabase.co', 'placeholder')
   }
 
-  return createClient(supabaseUrl, supabaseKey)
+  publicSupabase = createClient(supabaseUrl, supabaseKey)
+  return publicSupabase
 }
 
 /**

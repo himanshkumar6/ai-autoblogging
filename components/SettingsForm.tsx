@@ -19,7 +19,7 @@ import GlassCard from "./GlassCard";
 const tabs = [
   { id: "general", label: "General", icon: Layout },
   { id: "analytics", label: "Analytics & Scripts", icon: Activity },
-  { id: "ads", label: "Ads Management", icon: Code },
+  { id: "ads", label: "Ads Configuration", icon: Code },
   { id: "ai", label: "AI Config", icon: Bot },
   { id: "social", label: "Social Automation", icon: Twitter },
 ];
@@ -35,16 +35,17 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Rec
     faviconData: initialSettings.faviconData || "",
     ga4Id: initialSettings.ga4Id || "",
     customHeadScripts: initialSettings.customHeadScripts || "",
-    adsterraBanner: initialSettings.adsterraBanner || "",
-    adsterraNative: initialSettings.adsterraNative || "",
-    adsterraSocialBar: initialSettings.adsterraSocialBar || "",
-    adsterraLeaderboard: initialSettings.adsterraLeaderboard || "",
-    adsterraMobileBanner: initialSettings.adsterraMobileBanner || "",
-    adsterraSidebarSquare: initialSettings.adsterraSidebarSquare || "",
-    adsterraSidebarSkyscraper: initialSettings.adsterraSidebarSkyscraper || "",
-    adsterraPopunder: initialSettings.adsterraPopunder === "true" || initialSettings.adsterraPopunder === true,
     googleAdSensePublisherId: initialSettings.googleAdSensePublisherId || "",
-    adsenseEnabled: initialSettings.adsenseEnabled === "true" || initialSettings.adsenseEnabled === true,
+    ads: initialSettings.ads || {
+      ad_top_banner: "",
+      ad_mid_content: "",
+      ad_bottom_banner: "",
+      ad_sidebar_top: "",
+      ad_sidebar_bottom: "",
+      ad_between_posts: "",
+      ad_native_banner: "",
+      ad_social_bar: "",
+    },
     aiApiKey: initialSettings.aiApiKey || "",
     aiProvider: initialSettings.aiProvider || "gemini",
     gemini_api_key: initialSettings.gemini_api_key || "",
@@ -63,7 +64,20 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Rec
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const target = e.target as HTMLInputElement;
     const value = target.type === "checkbox" ? target.checked : target.value;
-    setFormData(prev => ({ ...prev, [target.name]: value }));
+    
+    if (target.name.includes('.')) {
+      const [parent, child] = target.name.split('.');
+      setFormData(prev => ({
+        ...prev,
+        [parent]: {
+          ...(prev[parent] || {}),
+          [child]: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [target.name]: value }));
+    }
+    
     setStatus({ type: null, msg: "" });
   };
 
@@ -210,63 +224,125 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Rec
           {activeTab === "ads" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-10">
               <div className="border-b border-gray-100 dark:border-white/5 pb-6">
-                <h2 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3 leading-tight"><Code size={28} className="text-purple-500"/> Monetization Pipeline</h2>
-                <p className="text-gray-500 dark:text-white/40 text-sm font-bold mt-2 ml-[40px]">Manage ad units and network scripts globally.</p>
+                <h2 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3 leading-tight"><Code size={28} className="text-purple-500"/> Ads Configuration</h2>
+                <p className="text-gray-500 dark:text-white/40 text-sm font-bold mt-2 ml-[40px]">Manage and organize your Adsterra ad codes across the site.</p>
               </div>
-              
-              <div className="p-6 md:p-8 border border-purple-200 dark:border-purple-500/20 bg-purple-50/30 dark:bg-purple-500/5 rounded-3xl">
-                <h3 className="font-black text-purple-900 dark:text-purple-100 mb-6 flex items-center gap-3 uppercase tracking-widest text-xs"><Code size={20}/> Adsterra Integrations</h3>
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em] mb-2">Banner Code (HTML)</label>
-                    <textarea name="adsterraBanner" rows={4} value={formData.adsterraBanner} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold" />
+
+              {/* Banner Ads Group */}
+              <div className="p-6 md:p-8 border border-purple-200 dark:border-purple-500/20 bg-purple-50/30 dark:bg-purple-500/5 rounded-3xl space-y-8">
+                <h3 className="font-black text-purple-900 dark:text-purple-100 flex items-center gap-3 uppercase tracking-widest text-xs"><Layout size={18}/> Banner Ads</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em]">Top Banner Ad</label>
+                    <textarea 
+                      name="ads.ad_top_banner" 
+                      rows={3} 
+                      value={formData.ads.ad_top_banner} 
+                      onChange={handleChange} 
+                      placeholder="Paste Adsterra code here"
+                      className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold placeholder:text-gray-300 dark:placeholder:text-white/5" 
+                    />
+                    <p className="text-[9px] text-gray-400 dark:text-white/20 font-bold italic">Renders at the very top of the article/home page.</p>
                   </div>
-                  <div>
-                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em] mb-2">Native / In-Article Code (HTML)</label>
-                    <textarea name="adsterraNative" rows={3} value={formData.adsterraNative} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold" />
+                  
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em]">Mid-Content Ad</label>
+                    <textarea 
+                      name="ads.ad_mid_content" 
+                      rows={3} 
+                      value={formData.ads.ad_mid_content} 
+                      onChange={handleChange} 
+                      placeholder="Paste Adsterra code here"
+                      className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold placeholder:text-gray-300 dark:placeholder:text-white/5" 
+                    />
+                    <p className="text-[9px] text-gray-400 dark:text-white/20 font-bold italic">Renders inside the article content body.</p>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em] mb-2">Desktop Leaderboard (728x90)</label>
-                      <textarea name="adsterraLeaderboard" rows={3} value={formData.adsterraLeaderboard} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold" />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em] mb-2">Mobile Banner (320x50)</label>
-                      <textarea name="adsterraMobileBanner" rows={3} value={formData.adsterraMobileBanner} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold" />
-                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em]">Bottom Banner Ad</label>
+                    <textarea 
+                      name="ads.ad_bottom_banner" 
+                      rows={3} 
+                      value={formData.ads.ad_bottom_banner} 
+                      onChange={handleChange} 
+                      placeholder="Paste Adsterra code here"
+                      className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold placeholder:text-gray-300 dark:placeholder:text-white/5" 
+                    />
+                    <p className="text-[9px] text-gray-400 dark:text-white/20 font-bold italic">Renders after the main content feed.</p>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em] mb-2">Sidebar Skyscraper (160x600)</label>
-                      <textarea name="adsterraSidebarSkyscraper" rows={3} value={formData.adsterraSidebarSkyscraper} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold" />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em] mb-2">Sidebar Square (300x250)</label>
-                      <textarea name="adsterraSidebarSquare" rows={3} value={formData.adsterraSidebarSquare} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold" />
-                    </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em]">Between Posts Ad</label>
+                    <textarea 
+                      name="ads.ad_between_posts" 
+                      rows={3} 
+                      value={formData.ads.ad_between_posts} 
+                      onChange={handleChange} 
+                      placeholder="Paste Adsterra code here"
+                      className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold placeholder:text-gray-300 dark:placeholder:text-white/5" 
+                    />
+                    <p className="text-[9px] text-gray-400 dark:text-white/20 font-bold italic">Renders between blog cards in the feed.</p>
                   </div>
-                  <div>
-                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em] mb-2">Global Social Bar (Sticky)</label>
-                    <textarea name="adsterraSocialBar" rows={3} value={formData.adsterraSocialBar} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold" />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em]">Sidebar Top Ad</label>
+                    <textarea 
+                      name="ads.ad_sidebar_top" 
+                      rows={3} 
+                      value={formData.ads.ad_sidebar_top} 
+                      onChange={handleChange} 
+                      placeholder="Paste Adsterra code here"
+                      className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold placeholder:text-gray-300 dark:placeholder:text-white/5" 
+                    />
                   </div>
-                  <div className="flex items-center gap-4 bg-white/60 dark:bg-black/40 p-4 rounded-xl border border-purple-200 dark:border-purple-500/10">
-                    <input type="checkbox" name="adsterraPopunder" checked={formData.adsterraPopunder} onChange={handleChange} className="w-6 h-6 accent-purple-600 rounded-lg cursor-pointer" />
-                    <label className="text-sm font-black text-gray-900 dark:text-white cursor-pointer select-none">Enable Adsterra Popunder Globally</label>
+
+                  <div className="space-y-2">
+                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em]">Sidebar Bottom Ad</label>
+                    <textarea 
+                      name="ads.ad_sidebar_bottom" 
+                      rows={3} 
+                      value={formData.ads.ad_sidebar_bottom} 
+                      onChange={handleChange} 
+                      placeholder="Paste Adsterra code here"
+                      className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold placeholder:text-gray-300 dark:placeholder:text-white/5" 
+                    />
                   </div>
                 </div>
               </div>
 
-              <div className="p-6 md:p-8 border border-blue-200 dark:border-blue-500/20 bg-blue-50/30 dark:bg-blue-500/5 rounded-3xl">
-                <h3 className="font-black text-blue-900 dark:text-blue-100 mb-6 flex items-center gap-4 uppercase tracking-widest text-xs"><Code size={20}/> Google AdSense</h3>
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4 bg-white/60 dark:bg-black/40 p-4 rounded-xl border border-blue-200 dark:border-blue-500/10">
-                    <input type="checkbox" name="adsenseEnabled" checked={formData.adsenseEnabled} onChange={handleChange} className="w-6 h-6 accent-blue-600 rounded-lg cursor-pointer" />
-                    <label className="text-sm font-black text-gray-900 dark:text-white cursor-pointer select-none">Enable AdSense Sitewide Activation</label>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-[0.2em] mb-2">Publisher ID</label>
-                    <input type="text" name="googleAdSensePublisherId" placeholder="pub-XXXXXXXXXXXXXXXX" value={formData.googleAdSensePublisherId} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-blue-200 dark:border-blue-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-blue-500 transition-all font-bold" />
-                  </div>
+              {/* Native Ads Group */}
+              <div className="p-6 md:p-8 border border-blue-200 dark:border-blue-500/20 bg-blue-50/30 dark:bg-blue-500/5 rounded-3xl space-y-8">
+                <h3 className="font-black text-blue-900 dark:text-blue-100 flex items-center gap-3 uppercase tracking-widest text-xs"><Activity size={18}/> Native Ads</h3>
+                
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-[0.2em]">Native Banner Ad</label>
+                  <textarea 
+                    name="ads.ad_native_banner" 
+                    rows={4} 
+                    value={formData.ads.ad_native_banner} 
+                    onChange={handleChange} 
+                    placeholder="Paste your Adsterra Native ad script here..."
+                    className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-blue-200 dark:border-blue-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-blue-500 transition-all font-bold placeholder:text-gray-300 dark:placeholder:text-white/5" 
+                  />
+                  <p className="text-[9px] text-gray-400 dark:text-white/20 font-bold italic">Standard native unit for highest editorial integration.</p>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-[0.2em]">Social Bar / Overlay Ad</label>
+                  <textarea 
+                    name="ads.ad_social_bar" 
+                    rows={3} 
+                    value={formData.ads.ad_social_bar} 
+                    onChange={handleChange} 
+                    placeholder="Paste Social Bar script here"
+                    className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-blue-200 dark:border-blue-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-blue-500 transition-all font-bold placeholder:text-gray-300 dark:placeholder:text-white/5" 
+                  />
+                  <p className="text-[9px] text-gray-400 dark:text-white/20 font-bold italic">Floating/Sticky unit that appears globally.</p>
                 </div>
               </div>
             </motion.div>

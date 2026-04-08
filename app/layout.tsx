@@ -7,7 +7,7 @@ import GlobalLoader from "@/components/GlobalLoader";
 
 import { getAllSettings } from "@/app/actions/settings";
 import Script from "next/script";
-import AdUnit from "@/components/AdUnit";
+import AdRenderer from "@/components/AdRenderer";
 
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin"], display: "swap", variable: "--font-playfair" });
@@ -28,6 +28,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return meta;
 }
+
+
 
 export default async function RootLayout({
   children,
@@ -54,30 +56,7 @@ export default async function RootLayout({
           </>
         )}
 
-        {/* Global Ad Networks (Popunders / Custom Scripts in Body) */}
-        {settings.customHeadScripts && (
-           <AdUnit html={settings.customHeadScripts} className="hidden" label="" />
-        )}
-        
-        {/* Adsterra Popunder Global */}
-        {settings.adsterraPopunder && settings.adsterraPopunder === true && (
-          <AdUnit html={settings.adsterraBanner} className="hidden" label="" />
-        )}
-        
-        {/* Adsterra Social Bar */}
-        {settings.adsterraSocialBar && (
-           <AdUnit html={settings.adsterraSocialBar} className="p-0" label="" />
-        )}
 
-        {/* Google AdSense Global Activation */}
-        {settings.adsenseEnabled && settings.googleAdSensePublisherId && (
-          <Script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${settings.googleAdSensePublisherId}`}
-            crossOrigin="anonymous"
-            strategy="afterInteractive"
-          />
-        )}
 
         <Providers>
           <div className="fixed inset-0 -z-20 bg-gradient-to-br from-[#020617] via-[#09090b] to-[#1e1b4b] dark:opacity-100 opacity-0 transition-opacity duration-1000" />
@@ -88,6 +67,12 @@ export default async function RootLayout({
             </LayoutWrapper>
           </GlobalLoader>
         </Providers>
+
+        {/* Global Social Bar / Overlay Ad */}
+        <AdRenderer 
+          adCode={settings.ads?.ad_social_bar || '<script src="https://horizontallyresearchpolar.com/68/1e/2f/681e2f7e5b96910cbd13d51ff80c521f.js"></script>'} 
+          className="!my-0 h-0 overflow-hidden" 
+        />
       </body>
     </html>
   );

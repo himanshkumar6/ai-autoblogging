@@ -44,25 +44,16 @@ function estimateReadTime(text: string) {
   return Math.ceil(words / wpm);
 }
 
-/**
- * Injects an ad unit after the Nth paragraph of the article content
- */
-function injectInContentAd(content: string, adHtml?: string) {
-  if (!adHtml) return content;
+// Helper to split content at Nth paragraph
+function splitContentAtParagraph(content: string, n: number): [string, string | null] {
+  const parts = content.split('</p>');
+  if (parts.length <= n) return [content, null];
   
-  const paragraphs = content.split('</p>');
-  if (paragraphs.length < 3) return content; // Not enough content for injection
-
-  // Inject after the 2nd paragraph
-  const adSlot = `
-    <div class="my-12 py-6 border-y border-black/5 dark:border-white/5 flex flex-col items-center gap-2">
-      <span class="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 dark:text-white/20">Sponsored Content</span>
-      <div class="ad-container-inner">${adHtml}</div>
-    </div>
-  `;
+  // Re-add the closing tags for the first part
+  const firstPart = parts.slice(0, n).join('</p>') + '</p>';
+  const secondPart = parts.slice(n).join('</p>');
   
-  paragraphs.splice(2, 0, adSlot);
-  return paragraphs.join('</p>');
+  return [firstPart, secondPart];
 }
 
 import Sidebar from "@/components/Sidebar";
@@ -90,8 +81,8 @@ export default async function BlogPostPage({ params }: Props) {
     .order("created_at", { ascending: false })
     .limit(4);
 
-  const readTime = estimateReadTime(post.content);
-  const enrichedContent = injectInContentAd(post.content, settings.adsterraNative);
+  const readTime = estimateReadTime(post.content || "");
+  const [contentHead, contentTail] = splitContentAtParagraph(post.content || "", 2);
 
   return (
     <article className="min-h-screen pt-8 pb-24 relative z-10">
@@ -209,8 +200,17 @@ export default async function BlogPostPage({ params }: Props) {
                            prose-a:text-accent-cyan hover:prose-a:text-accent-blue prose-a:no-underline
                            prose-img:rounded-[2.5rem] prose-img:shadow-2xl
                            editorial-content"
-                dangerouslySetInnerHTML={{ __html: enrichedContent }} 
-              />
+              >
+                <div dangerouslySetInnerHTML={{ __html: contentHead }} />
+                
+                {contentTail && settings.adsterraNative && (
+                  <div className="my-12 py-8 border-y border-black/5 dark:border-white/5 flex flex-col items-center gap-2">
+                    <AdUnit html={settings.adsterraNative} label="Sponsored Content" />
+                  </div>
+                )}
+                
+                {contentTail && <div dangerouslySetInnerHTML={{ __html: contentTail }} />}
+              </div>
 
               {/* Bottom Article Ad */}
               {settings.adsterraBanner && (

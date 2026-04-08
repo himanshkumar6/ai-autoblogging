@@ -106,6 +106,7 @@ export default async function Home({ searchParams }: Props) {
                 <div key={post.id} className="contents">
                   <BlogCard 
                     post={post}
+                    index={i}
                     priority={i < 2}
                   />
                   {/* Multi-slot Native Ad Injection */}

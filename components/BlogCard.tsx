@@ -18,9 +18,10 @@ interface BlogCardProps {
     image_url?: string;
   };
   index: number;
+  priority?: boolean;
 }
 
-export default function BlogCard({ post, index }: BlogCardProps) {
+export default function BlogCard({ post, index, priority = false }: BlogCardProps) {
   const date = new Date(post.created_at).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -57,7 +58,7 @@ export default function BlogCard({ post, index }: BlogCardProps) {
               alt={post.title} 
               fill
               className="object-cover transition-all duration-700 group-hover:scale-105 group-hover:brightness-110"
-              loading="lazy"
+              priority={priority}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/20 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-60" />

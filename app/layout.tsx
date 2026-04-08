@@ -7,6 +7,7 @@ import GlobalLoader from "@/components/GlobalLoader";
 
 import { getAllSettings } from "@/app/actions/settings";
 import Script from "next/script";
+import AdUnit from "@/components/AdUnit";
 
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin"], display: "swap", variable: "--font-playfair" });
@@ -55,12 +56,17 @@ export default async function RootLayout({
 
         {/* Global Ad Networks (Popunders / Custom Scripts in Body) */}
         {settings.customHeadScripts && (
-           <div dangerouslySetInnerHTML={{ __html: settings.customHeadScripts }} style={{ display: 'none' }} />
+           <AdUnit html={settings.customHeadScripts} className="hidden" label="" />
         )}
         
-        {/* Adsterra Integrations */}
+        {/* Adsterra Popunder Global */}
+        {settings.adsterraPopunder && settings.adsterraPopunder === true && (
+          <AdUnit html={settings.adsterraBanner} className="hidden" label="" />
+        )}
+        
+        {/* Adsterra Social Bar */}
         {settings.adsterraSocialBar && (
-           <div dangerouslySetInnerHTML={{ __html: settings.adsterraSocialBar }} />
+           <AdUnit html={settings.adsterraSocialBar} className="p-0" label="" />
         )}
 
         {/* Google AdSense Global Activation */}

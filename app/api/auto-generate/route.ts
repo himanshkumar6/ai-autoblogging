@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getTrendingTopic } from "@/lib/trending";
 import { generateBlog } from "@/lib/groq";
 import { generateImage } from "@/lib/image";
@@ -82,6 +83,16 @@ async function orchestrateGeneration(request: Request) {
     const savedPost = await createPost(postPayload);
     if (!savedPost) throw new Error("Database operation failed to return saved record.");
     
+    // --- ON-DEMAND REVALIDATION (The Secret Sauce) ---
+    // This tells Next.js to clear the cache for these pages immediately
+    try {
+      revalidatePath("/");
+      revalidatePath(`/blog/${savedPost.slug}`);
+      console.log(`[${requestId}] [Cache] Revalidation triggered for / and /blog/${savedPost.slug}`);
+    } catch (cacheError) {
+      console.warn(`[${requestId}] [Cache Warning] Revalidation failed but post was saved.`, cacheError);
+    }
+
     console.log(`[${requestId}] === PIPELINE COMPLETED SUCCESSFULLY ===`);
 
     return NextResponse.json({

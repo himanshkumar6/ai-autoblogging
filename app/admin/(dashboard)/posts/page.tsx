@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import { createClient } from "@/lib/supabase/server";
-// Removed unused import
+import PostActions from "@/components/PostActions";
 
 export default async function AdminPosts() {
   const supabase = createClient();
@@ -58,9 +58,8 @@ export default async function AdminPosts() {
                         {post.tweeted ? '✓ Active' : 'Idle'}
                       </span>
                     </td>
-                    <td className="px-8 py-6 text-right whitespace-nowrap opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                      <button className="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 transition-all text-xs font-black mr-6 border-b-2 border-transparent hover:border-purple-500">Edit</button>
-                      <button className="text-red-500 hover:text-red-600 dark:hover:text-red-400 transition-all text-xs font-black border-b-2 border-transparent hover:border-red-500">Delete</button>
+                    <td className="px-8 py-6 text-right whitespace-nowrap">
+                      <PostActions id={post.id} title={post.title} />
                     </td>
                   </tr>
                 ))

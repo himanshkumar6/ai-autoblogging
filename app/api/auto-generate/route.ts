@@ -4,16 +4,15 @@ import { generateBlog } from "@/lib/groq";
 import { generateImage } from "@/lib/image";
 import { createPost } from "@/lib/supabase-core";
 
-// 1. CORE CONFIGURATION (Vercel Production Constraints)
+// 1. CORE CONFIGURATION
 export const dynamic = "force-dynamic";
-export const maxDuration = 300; // 5 minutes (Maximum for Vercel Pro, Hobby is 60s)
-export const runtime = "nodejs"; // Native Node.js runtime for complex AI processing
+export const maxDuration = 300; 
+export const runtime = "nodejs";
 
 /**
- * PRODUCTION-READY AUTO-GENERATION ROUTE
- * Handles Vercel Cron triggers and manual admin requests.
+ * SHARED ORCHESTRATOR
  */
-export async function GET(request: Request) {
+async function orchestrateGeneration(request: Request) {
   const requestId = Math.random().toString(36).substring(7);
   console.log(`[${requestId}] === STARTING AUTO-GENERATION PIPELINE ===`);
 
@@ -42,7 +41,7 @@ export async function GET(request: Request) {
   // 3. SEGMENTED PIPELINE EXECUTION
   let topic = "";
   let blogData = null;
-  let finalImageUrl = "https://images.unsplash.com/photo-1518770660439-4636190af475"; // Default fallback
+  let finalImageUrl = "https://images.unsplash.com/photo-1518770660439-4636190af475"; 
 
   try {
     // STEP 1: Trending Topic Discovery
@@ -69,7 +68,6 @@ export async function GET(request: Request) {
       }
     } catch (imageError: any) {
       console.error(`[${requestId}] [Step 3 Failure] Image pipeline crashed:`, imageError.message);
-      console.log(`[${requestId}] [Step 3] Falling back to default image to save the post.`);
     }
 
     // STEP 4: Database Persistence (Supabase)
@@ -85,9 +83,7 @@ export async function GET(request: Request) {
     if (!savedPost) throw new Error("Database operation failed to return saved record.");
     
     console.log(`[${requestId}] === PIPELINE COMPLETED SUCCESSFULLY ===`);
-    console.log(`[${requestId}] Post Created: ${savedPost.slug}`);
 
-    // 4. CLEAN SUCCESS RESPONSE
     return NextResponse.json({
       success: true,
       data: {
@@ -99,7 +95,6 @@ export async function GET(request: Request) {
     });
 
   } catch (pipelineError: any) {
-    // 5. GRANULAR FAILURE HANDLING
     const failureSource = pipelineError.message.includes("Groq") ? "Groq" :
                          pipelineError.message.includes("Database") ? "Supabase" :
                          pipelineError.message.includes("Topic") ? "Trending Lib" : "Orchestrator";
@@ -113,4 +108,15 @@ export async function GET(request: Request) {
       requestId
     }, { status: 500 });
   }
+}
+
+/**
+ * EXPORT BOTH GET AND POST TO SUPPORT EXTERNAL CRON SERVICES
+ */
+export async function GET(request: Request) {
+  return orchestrateGeneration(request);
+}
+
+export async function POST(request: Request) {
+  return orchestrateGeneration(request);
 }

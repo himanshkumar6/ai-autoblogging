@@ -27,7 +27,7 @@ import { motion, AnimatePresence } from "framer-motion";
  */
 export default function AdminSidebar({ userEmail }: { userEmail: string }) {
   const [isOpen, setIsOpen] = useState(false);
-  const pathname = usePathname();
+  const pathname = usePathname() || "";
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 

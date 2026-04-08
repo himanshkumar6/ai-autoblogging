@@ -6,7 +6,7 @@ import Loader from "@/components/Loader";
 import { AnimatePresence } from "framer-motion";
 
 export default function RouteLoader() {
-  const pathname = usePathname();
+  const pathname = usePathname() || "";
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);

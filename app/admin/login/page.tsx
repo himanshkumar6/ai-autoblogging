@@ -20,7 +20,7 @@ function LoginForm() {
 
   // Show error from callback redirect (e.g. ?error=auth_failed)
   useEffect(() => {
-    const errorCode = searchParams.get("error");
+    const errorCode = searchParams?.get("error");
     if (errorCode) {
       setError(ERROR_MESSAGES[errorCode] ?? "An unexpected error occurred. Please try again.");
     }

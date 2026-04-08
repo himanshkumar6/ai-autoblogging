@@ -6,7 +6,7 @@ import Loader from "@/components/Loader";
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function GlobalLoader({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
+  const pathname = usePathname() || "";
   
   // 1. Initially set to true so it ALWAYS shows immediately on page load
   const [isLoading, setIsLoading] = useState(true);

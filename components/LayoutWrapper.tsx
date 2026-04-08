@@ -6,7 +6,7 @@ import Footer from "./Footer";
 import ParticleBackground from "./ParticleBackground";
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
+  const pathname = usePathname() || "";
   const isAdmin = pathname.startsWith("/admin");
   const isAccessDenied = pathname.startsWith("/access-denied");
 

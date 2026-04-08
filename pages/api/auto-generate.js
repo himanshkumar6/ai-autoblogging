@@ -38,11 +38,20 @@ export default async function handler(req, res) {
       throw new Error("Saving to database failed.");
     }
 
-    // 5. SUCCESS RESPONE
+    // 5. REVALIDATION: Refresh the homepage immediately
+    try {
+      await res.revalidate("/");
+      console.log("[Pipeline] Homepage revalidated successfully.");
+    } catch (revalError) {
+      console.error(`[Pipeline Warning] Revalidation failed: ${revalError.message}`);
+      // Don't fail the whole request if only revalidation fails
+    }
+
+    // 6. SUCCESS RESPONSE
     console.log("[Pipeline] Pipeline completed successfully.");
     return res.status(200).json({
       success: true,
-      message: "Blog generated and saved successfully.",
+      message: "Blog generated, saved, and homepage refreshed successfully.",
       post: savedPost,
     });
 

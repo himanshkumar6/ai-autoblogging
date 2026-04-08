@@ -37,6 +37,11 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Rec
     customHeadScripts: initialSettings.customHeadScripts || "",
     adsterraBanner: initialSettings.adsterraBanner || "",
     adsterraNative: initialSettings.adsterraNative || "",
+    adsterraSocialBar: initialSettings.adsterraSocialBar || "",
+    adsterraLeaderboard: initialSettings.adsterraLeaderboard || "",
+    adsterraMobileBanner: initialSettings.adsterraMobileBanner || "",
+    adsterraSidebarSquare: initialSettings.adsterraSidebarSquare || "",
+    adsterraSidebarSkyscraper: initialSettings.adsterraSidebarSkyscraper || "",
     adsterraPopunder: initialSettings.adsterraPopunder === "true" || initialSettings.adsterraPopunder === true,
     googleAdSensePublisherId: initialSettings.googleAdSensePublisherId || "",
     adsenseEnabled: initialSettings.adsenseEnabled === "true" || initialSettings.adsenseEnabled === true,
@@ -217,8 +222,32 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Rec
                     <textarea name="adsterraBanner" rows={4} value={formData.adsterraBanner} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold" />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em] mb-2">Native Code (HTML)</label>
-                    <textarea name="adsterraNative" rows={4} value={formData.adsterraNative} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold" />
+                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em] mb-2">Native / In-Article Code (HTML)</label>
+                    <textarea name="adsterraNative" rows={3} value={formData.adsterraNative} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold" />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em] mb-2">Desktop Leaderboard (728x90)</label>
+                      <textarea name="adsterraLeaderboard" rows={3} value={formData.adsterraLeaderboard} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em] mb-2">Mobile Banner (320x50)</label>
+                      <textarea name="adsterraMobileBanner" rows={3} value={formData.adsterraMobileBanner} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em] mb-2">Sidebar Skyscraper (160x600)</label>
+                      <textarea name="adsterraSidebarSkyscraper" rows={3} value={formData.adsterraSidebarSkyscraper} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em] mb-2">Sidebar Square (300x250)</label>
+                      <textarea name="adsterraSidebarSquare" rows={3} value={formData.adsterraSidebarSquare} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em] mb-2">Global Social Bar (Sticky)</label>
+                    <textarea name="adsterraSocialBar" rows={3} value={formData.adsterraSocialBar} onChange={handleChange} className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold" />
                   </div>
                   <div className="flex items-center gap-4 bg-white/60 dark:bg-black/40 p-4 rounded-xl border border-purple-200 dark:border-purple-500/10">
                     <input type="checkbox" name="adsterraPopunder" checked={formData.adsterraPopunder} onChange={handleChange} className="w-6 h-6 accent-purple-600 rounded-lg cursor-pointer" />

@@ -1,4 +1,4 @@
-import { getSupabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase-core";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -7,6 +7,9 @@ import { ArrowLeft, Twitter, Linkedin, Link as LinkIcon, Share2, Image as ImageI
 import Container from "@/components/Container";
 import GlassCard from "@/components/GlassCard";
 import ReadingProgress from "@/components/ReadingProgress";
+
+import AdUnit from "@/components/AdUnit";
+import { getAllSettings } from "@/app/actions/settings";
 
 interface Props {
   params: { slug: string };
@@ -41,8 +44,34 @@ function estimateReadTime(text: string) {
   return Math.ceil(words / wpm);
 }
 
+/**
+ * Injects an ad unit after the Nth paragraph of the article content
+ */
+function injectInContentAd(content: string, adHtml?: string) {
+  if (!adHtml) return content;
+  
+  const paragraphs = content.split('</p>');
+  if (paragraphs.length < 3) return content; // Not enough content for injection
+
+  // Inject after the 2nd paragraph
+  const adSlot = `
+    <div class="my-12 py-6 border-y border-black/5 dark:border-white/5 flex flex-col items-center gap-2">
+      <span class="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 dark:text-white/20">Sponsored Content</span>
+      <div class="ad-container-inner">${adHtml}</div>
+    </div>
+  `;
+  
+  paragraphs.splice(2, 0, adSlot);
+  return paragraphs.join('</p>');
+}
+
+import Sidebar from "@/components/Sidebar";
+
 export default async function BlogPostPage({ params }: Props) {
+  const settings = await getAllSettings();
   const supabase = getSupabase();
+  
+  // Fetch post
   const { data: post, error } = await supabase
     .from("posts")
     .select("*")
@@ -53,114 +82,151 @@ export default async function BlogPostPage({ params }: Props) {
     notFound();
   }
 
+  // Fetch trending for sidebar
+  const { data: trendingPosts } = await supabase
+    .from("posts")
+    .select("id, title, slug")
+    .eq("published", true)
+    .order("created_at", { ascending: false })
+    .limit(4);
+
   const readTime = estimateReadTime(post.content);
+  const enrichedContent = injectInContentAd(post.content, settings.adsterraNative);
 
   return (
     <article className="min-h-screen pt-8 pb-24 relative z-10">
       <ReadingProgress />
       
-      <Container className="max-w-[800px]">
-        {/* Navigation & Back Link */}
-        <div className="mb-8">
-          <Link 
-            href="/" 
-            className="group inline-flex items-center text-sm font-semibold text-secondary hover:text-accent-cyan transition-colors"
-          >
-            <div className="p-2 rounded-full bg-white/5 border border-white/5 group-hover:bg-accent-cyan/10 group-hover:border-accent-cyan/30 transition-colors mr-3">
-              <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
-            </div>
-            Back to Feed
-          </Link>
-        </div>
-
-        <GlassCard className="p-8 md:p-16 border-t border-b sm:border border-black/5 dark:border-white/5 !bg-white/40 dark:!bg-[#0a0a0f]/40 backdrop-blur-3xl shadow-2xl overflow-hidden">
-          
-          {/* Article Header */}
-          <header className="mb-16 flex flex-col items-center text-center">
-            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-3 text-[11px] font-black uppercase tracking-[0.2em] mb-10">
-              <span className="px-3 py-1.5 rounded-lg bg-accent-cyan/10 text-accent-cyan border border-accent-cyan/20">
-                Market Intel
-              </span>
-              <span className="text-gray-300 dark:text-white/20">/</span>
-              <time dateTime={post.created_at} className="text-gray-700 dark:text-white/40">
-                {new Date(post.created_at).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric"
-                })}
-              </time>
-              <span className="text-gray-300 dark:text-white/20">/</span>
-              <span className="text-accent-blue dark:text-accent-purple font-black">
-                {readTime} min read
-              </span>
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-display font-black text-gray-900 dark:text-white tracking-tighter leading-[0.95] mb-10 text-balance text-center mx-auto max-w-4xl">
-              {post.title}
-            </h1>
-            
-            <p className="text-xl sm:text-2xl text-gray-700 dark:text-white/40 italic leading-relaxed mb-12 font-body font-medium tracking-tight text-center mx-auto max-w-2xl">
-              {post.meta_description}
-            </p>
-
-            {/* Author Block */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full py-10 border-t border-b border-black/5 dark:border-white/5 gap-8">
-              <div className="flex items-center gap-5">
-                <div className="w-16 h-16 rounded-2xl bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 p-0.5 flex items-center justify-center shadow-xl">
-                   <div className="w-full h-full rounded-[14px] bg-gradient-to-br from-accent-cyan via-accent-blue to-accent-purple flex items-center justify-center">
-                    <span className="text-white font-display font-black text-xl tracking-tighter">Ai</span>
-                   </div>
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest leading-none mb-2 flex items-center gap-2">
-                    Cyber Analyst Model
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-white/30 font-bold tracking-widest uppercase font-display">Autonomous Intelligence Engine</p>
-                </div>
-              </div>
-
-              {/* Share Buttons */}
-              <div className="flex items-center gap-2">
-                <button className="flex items-center gap-2 px-5 py-3 rounded-xl bg-black/5 dark:bg-white/5 text-gray-500 dark:text-white/40 hover:text-white hover:bg-black dark:hover:bg-white dark:hover:text-black transition-all font-black text-[10px] uppercase tracking-widest border border-transparent hover:border-white/10" aria-label="Share on X">
-                  <Twitter size={14} />
-                  Share
-                </button>
-                <button className="p-3 rounded-xl bg-black/5 dark:bg-white/5 text-gray-500 dark:text-white/40 hover:text-white hover:bg-black dark:hover:bg-white dark:hover:text-black transition-all border border-transparent hover:border-white/10" aria-label="Copy Link">
-                  <LinkIcon size={14} />
-                </button>
-              </div>
-            </div>
-          </header>
-
-          {post.image_url && (
-            <div className="relative w-full aspect-[16/9] mb-20 overflow-hidden bg-white/5 rounded-[2rem] border border-black/5 dark:border-white/5 shadow-2xl">
-              <Image 
-                src={post.image_url} 
-                alt={post.title} 
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1200px"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f]/80 via-transparent to-transparent opacity-80" />
+      <Container>
+        {/* Top Content Leaderboard */}
+        <div className="mb-12">
+          {settings.adsterraLeaderboard && (
+            <div className="hidden md:flex justify-center py-4">
+              <AdUnit html={settings.adsterraLeaderboard} />
             </div>
           )}
+          {settings.adsterraMobileBanner && (
+            <div className="flex md:hidden justify-center py-2">
+              <AdUnit html={settings.adsterraMobileBanner} />
+            </div>
+          )}
+        </div>
 
-          {/* Article Body Content */}
-          <div 
-            className="prose prose-lg sm:prose-2xl mx-auto dark:prose-invert font-body
-                       prose-headings:font-display prose-headings:font-black prose-headings:tracking-tighter prose-headings:text-gray-900 dark:prose-headings:text-white
-                       prose-p:text-gray-800 dark:prose-p:text-white/70 prose-p:leading-[1.8]
-                       prose-strong:text-gray-900 dark:prose-strong:text-white
-                       prose-a:text-accent-cyan hover:prose-a:text-accent-blue prose-a:no-underline
-                       prose-img:rounded-[2.5rem] prose-img:shadow-2xl
-                       editorial-content
-                       max-w-none"
-            dangerouslySetInnerHTML={{ __html: post.content }} 
+        <div className="flex flex-col lg:flex-row gap-12 items-start">
+          <div className="flex-1 min-w-0">
+            {/* Navigation & Back Link */}
+            <div className="mb-8">
+              <Link 
+                href="/" 
+                className="group inline-flex items-center text-sm font-semibold text-secondary hover:text-accent-cyan transition-colors"
+              >
+                <div className="p-2 rounded-full bg-white/5 border border-white/5 group-hover:bg-accent-cyan/10 group-hover:border-accent-cyan/30 transition-colors mr-3">
+                  <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+                </div>
+                Back to Feed
+              </Link>
+            </div>
+
+            <GlassCard className="p-8 md:p-12 border-t border-b sm:border border-black/5 dark:border-white/5 !bg-white/40 dark:!bg-[#0a0a0f]/40 backdrop-blur-3xl shadow-2xl overflow-hidden">
+              {/* Article Header */}
+              <header className="mb-16 flex flex-col items-center text-center">
+                <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-3 text-[11px] font-black uppercase tracking-[0.2em] mb-10">
+                  <span className="px-3 py-1.5 rounded-lg bg-accent-cyan/10 text-accent-cyan border border-accent-cyan/20">
+                    Market Intel
+                  </span>
+                  <span className="text-gray-300 dark:text-white/20">/</span>
+                  <time dateTime={post.created_at} className="text-gray-700 dark:text-white/40">
+                    {new Date(post.created_at).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric"
+                    })}
+                  </time>
+                  <span className="text-gray-300 dark:text-white/20">/</span>
+                  <span className="text-accent-blue dark:text-accent-purple font-black">
+                    {readTime} min read
+                  </span>
+                </div>
+
+                <h1 className="text-4xl sm:text-5xl lg:text-7xl font-display font-black text-gray-900 dark:text-white tracking-tighter leading-[0.95] mb-10 text-balance text-center mx-auto max-w-4xl">
+                  {post.title}
+                </h1>
+                
+                <p className="text-lg text-gray-700 dark:text-white/40 italic leading-relaxed mb-12 font-body font-medium tracking-tight text-center mx-auto max-w-2xl">
+                  {post.meta_description}
+                </p>
+
+                {/* Author Block */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full py-10 border-t border-b border-black/5 dark:border-white/5 gap-8">
+                  <div className="flex items-center gap-5 text-left">
+                    <div className="w-14 h-14 rounded-2xl bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 p-0.5 flex items-center justify-center shadow-xl shrink-0">
+                       <div className="w-full h-full rounded-[13px] bg-gradient-to-br from-accent-cyan via-accent-blue to-accent-purple flex items-center justify-center">
+                        <span className="text-white font-display font-black text-lg tracking-tighter">Ai</span>
+                       </div>
+                    </div>
+                    <div>
+                      <p className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest leading-none mb-1.5 flex items-center gap-2">
+                        Cyber Analyst Model
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                      </p>
+                      <p className="text-[10px] text-gray-500 dark:text-white/30 font-bold tracking-widest uppercase font-display">Autonomous Intelligence Engine</p>
+                    </div>
+                  </div>
+
+                  {/* Share Buttons */}
+                  <div className="flex items-center gap-2">
+                    <button className="flex items-center gap-2 px-5 py-3 rounded-xl bg-black/5 dark:bg-white/5 text-gray-500 dark:text-white/40 hover:text-white hover:bg-black dark:hover:bg-white dark:hover:text-black transition-all font-black text-[10px] uppercase tracking-widest border border-transparent hover:border-white/10" aria-label="Share on X">
+                      <Twitter size={14} />
+                      Share
+                    </button>
+                    <button className="p-3 rounded-xl bg-black/5 dark:bg-white/5 text-gray-500 dark:text-white/40 hover:text-white hover:bg-black dark:hover:bg-white dark:hover:text-black transition-all border border-transparent hover:border-white/10" aria-label="Copy Link">
+                      <LinkIcon size={14} />
+                    </button>
+                  </div>
+                </div>
+              </header>
+
+              {post.image_url && (
+                <div className="relative w-full aspect-[16/9] mb-12 overflow-hidden bg-white/5 rounded-[2rem] border border-black/5 dark:border-white/5 shadow-2xl">
+                  <Image 
+                    src={post.image_url} 
+                    alt={post.title} 
+                    fill
+                    className="object-cover"
+                    priority
+                    sizes="(max-width: 1200px) 100vw, 800px"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f]/80 via-transparent to-transparent opacity-80" />
+                </div>
+              )}
+
+              {/* Article Body Content */}
+              <div 
+                className="prose prose-lg sm:prose-xl mx-auto dark:prose-invert font-body
+                           prose-headings:font-display prose-headings:font-black prose-headings:tracking-tighter prose-headings:text-gray-900 dark:prose-headings:text-white
+                           prose-p:text-gray-800 dark:prose-p:text-white/70 prose-p:leading-[1.8]
+                           prose-strong:text-gray-900 dark:prose-strong:text-white
+                           prose-a:text-accent-cyan hover:prose-a:text-accent-blue prose-a:no-underline
+                           prose-img:rounded-[2.5rem] prose-img:shadow-2xl
+                           editorial-content"
+                dangerouslySetInnerHTML={{ __html: enrichedContent }} 
+              />
+
+              {/* Bottom Article Ad */}
+              {settings.adsterraBanner && (
+                <div className="mt-16 pt-12 border-t border-black/5 dark:border-white/5 flex justify-center">
+                  <AdUnit html={settings.adsterraBanner} />
+                </div>
+              )}
+            </GlassCard>
+          </div>
+
+          <Sidebar 
+            trendingPosts={trendingPosts || []}
+            adSkyscraper={settings.adsterraSidebarSkyscraper}
+            adSquare={settings.adsterraSidebarSquare}
           />
-
-        </GlassCard>
+        </div>
       </Container>
     </article>
   );

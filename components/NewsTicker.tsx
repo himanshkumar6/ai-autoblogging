@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { getSupabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase-core";
 
 export default function NewsTicker() {
   const [headlines, setHeadlines] = useState<any[]>([]);

@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { getTrendingTopic } from "@/lib/trending";
 import { generateBlog } from "@/lib/groq";
 import { generateImage } from "@/lib/image";
-import { createPost } from "@/lib/supabase";
+import { createPost } from "@/lib/supabase-core";
 
 export async function GET(request: Request) {
   // MANDATORY TRIGGER LOG

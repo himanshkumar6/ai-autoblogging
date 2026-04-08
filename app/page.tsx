@@ -1,8 +1,10 @@
-import { getSupabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase-core";
 import Container from "@/components/Container";
 import BlogCard from "@/components/BlogCard";
 import Sidebar from "@/components/Sidebar";
 import HeroButtons from "@/components/HeroButtons";
+import AdUnit from "@/components/AdUnit";
+import { getAllSettings } from "./actions/settings";
 
 import Pagination from "@/components/Pagination";
 
@@ -13,6 +15,7 @@ interface Props {
 }
 
 export default async function Home({ searchParams }: Props) {
+  const settings = await getAllSettings();
   const page = parseInt(searchParams.page || "1");
   const postsPerPage = 6;
   const from = (page - 1) * postsPerPage;
@@ -71,36 +74,67 @@ export default async function Home({ searchParams }: Props) {
         </Container>
       </section>
 
+      {/* Top Page Leaderboard - Responsive Slot */}
+      <Container className="mb-8">
+        {/* Desktop Leaderboard */}
+        {settings.adsterraLeaderboard && (
+          <div className="hidden md:flex justify-center py-4">
+            <AdUnit html={settings.adsterraLeaderboard} />
+          </div>
+        )}
+        {/* Mobile Banner */}
+        {settings.adsterraMobileBanner && (
+          <div className="flex md:hidden justify-center py-2">
+            <AdUnit html={settings.adsterraMobileBanner} />
+          </div>
+        )}
+      </Container>
+
       {/* Main Content Layout */}
       <Container className="pb-24 pt-8 text-black" >
         <div className="flex flex-col lg:flex-row gap-12 relative z-10" id="latest-posts">
           
           {/* Main Feed */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <div className="flex items-center gap-4 mb-10">
-              <h2 className="text-3xl font-black tracking-tight text-primary">Market Feeds</h2>
+              <h2 className="text-3xl font-black tracking-tight text-primary dark:text-white">Market Feeds</h2>
               <div className="h-px flex-1 bg-gradient-to-r from-black/10 dark:from-white/10 to-transparent" />
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
-              {!posts || posts.length === 0 ? (
-                <div className="col-span-full py-24 text-center bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 shadow-lg">
-                  <div className="w-16 h-16 border-4 border-accent-cyan border-t-transparent rounded-full animate-spin mx-auto mb-6" />
-                  <p className="text-secondary text-lg font-medium">Synchronizing on-chain data models...</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
+              {posts?.map((post: any, i: number) => (
+                <div key={post.id} className="contents">
+                  <BlogCard 
+                    post={post}
+                    priority={i < 2}
+                  />
+                  {/* Multi-slot Native Ad Injection */}
+                  {((i === 2 && settings.adsterraNative) || (i === 5 && settings.adsterraNative)) && (
+                    <div className="col-span-1 md:col-span-2 my-8 py-8 border-y border-black/5 dark:border-white/5 flex flex-col items-center gap-2">
+                       <span className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 dark:text-white/20">Sponsored</span>
+                       <AdUnit html={settings.adsterraNative} />
+                    </div>
+                  )}
                 </div>
-              ) : (
-                posts.map((post, index) => (
-                  <BlogCard key={post.id} post={post} index={index} />
-                ))
-              )}
+              ))}
             </div>
 
-            {/* Pagination Controls */}
-            <Pagination currentPage={page} totalPages={totalPages} />
+            {(!posts || posts.length === 0) ? (
+              <div className="text-center py-24 bg-white/5 rounded-[2.5rem] border border-dashed border-white/10">
+                <p className="text-gray-400 font-display text-xl">Awaiting the next wave of intelligence...</p>
+              </div>
+            ) : (
+              <div className="mt-16">
+                <Pagination currentPage={page} totalPages={totalPages} />
+              </div>
+            )}
           </div>
 
-          <Sidebar trendingPosts={posts ? posts.slice(0, 4) : []} />
-
+          <Sidebar 
+            trendingPosts={posts ? posts.slice(0, 4) : []} 
+            adSkyscraper={settings.adsterraSidebarSkyscraper}
+            adSquare={settings.adsterraSidebarSquare}
+          />
         </div>
       </Container>
     </>

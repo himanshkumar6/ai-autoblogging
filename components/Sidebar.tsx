@@ -3,12 +3,15 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import GlassCard from "./GlassCard";
+import AdUnit from "./AdUnit";
 
 interface SidebarProps {
   trendingPosts?: any[];
+  adSkyscraper?: string;
+  adSquare?: string;
 }
 
-export default function Sidebar({ trendingPosts = [] }: SidebarProps) {
+export default function Sidebar({ trendingPosts = [], adSkyscraper, adSquare }: SidebarProps) {
   // If we don't have enough posts yet, fallback to a neat empty state or placeholders
   const displayPosts = trendingPosts.length > 0 ? trendingPosts : [];
 
@@ -54,6 +57,11 @@ export default function Sidebar({ trendingPosts = [] }: SidebarProps) {
         </ul>
       </GlassCard>
 
+      {/* Sidebar Top Ad Slot (Skyscraper) */}
+      {adSkyscraper && (
+        <AdUnit html={adSkyscraper} />
+      )}
+
       {/* Newsletter Widget */}
       <GlassCard
         initial={{ opacity: 0, x: 20 }}
@@ -83,6 +91,10 @@ export default function Sidebar({ trendingPosts = [] }: SidebarProps) {
         </div>
       </GlassCard>
 
+      {/* Sidebar Bottom Ad Slot (Square) */}
+      {adSquare && (
+        <AdUnit html={adSquare} />
+      )}
     </aside>
   );
 }

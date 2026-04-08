@@ -57,8 +57,20 @@ export default async function RootLayout({
         {settings.customHeadScripts && (
            <div dangerouslySetInnerHTML={{ __html: settings.customHeadScripts }} style={{ display: 'none' }} />
         )}
-        {(settings.adsterraPopunder === "true" || settings.adsterraPopunder === true) && settings.adsterraNative && (
-           <div dangerouslySetInnerHTML={{ __html: settings.adsterraNative }} style={{ display: 'none' }} />
+        
+        {/* Adsterra Integrations */}
+        {settings.adsterraSocialBar && (
+           <div dangerouslySetInnerHTML={{ __html: settings.adsterraSocialBar }} />
+        )}
+
+        {/* Google AdSense Global Activation */}
+        {settings.adsenseEnabled && settings.googleAdSensePublisherId && (
+          <Script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${settings.googleAdSensePublisherId}`}
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
         )}
 
         <Providers>

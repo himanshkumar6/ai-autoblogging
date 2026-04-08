@@ -147,6 +147,3 @@ export default function AdminGenerate() {
     </div>
   );
 }
-
-  );
-}

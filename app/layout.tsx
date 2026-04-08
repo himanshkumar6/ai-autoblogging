@@ -59,7 +59,10 @@ export default async function RootLayout({
           </>
         )}
 
-
+        {/* Monetag Vignette Interstitial Ad */}
+        <Script id="monetag-vignette-script" strategy="afterInteractive">
+          {`(function(s){s.dataset.zone='10850726',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));`}
+        </Script>
 
         <Providers>
           <div className="fixed inset-0 -z-20 bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0] dark:from-[#020617] dark:via-[#09090b] dark:to-[#020617] transition-opacity duration-1000 w-full h-full" />

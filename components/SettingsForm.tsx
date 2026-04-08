@@ -33,6 +33,9 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Rec
     siteName: initialSettings.siteName || "",
     siteDescription: initialSettings.siteDescription || "",
     faviconData: initialSettings.faviconData || "",
+    authorName: initialSettings.authorName || "Himanshu",
+    authorDesignation: initialSettings.authorDesignation || "Crypto Analyst",
+    authorImage: initialSettings.authorImage || "",
     ga4Id: initialSettings.ga4Id || "",
     customHeadScripts: initialSettings.customHeadScripts || "",
     ads: initialSettings.ads || {
@@ -191,6 +194,51 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Rec
                          Choose New Asset
                        </label>
                        <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-3 font-black uppercase tracking-widest">Replaces the globe icon on browser tabs.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-gray-100 dark:border-white/5 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-2">Author Name</label>
+                    <input type="text" name="authorName" value={formData.authorName} onChange={handleChange} className="w-full bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/5 transition-all font-bold text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-2">Author Designation</label>
+                    <input type="text" name="authorDesignation" value={formData.authorDesignation} onChange={handleChange} className="w-full bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/5 transition-all font-bold text-sm" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-4">Author Avatar Image</label>
+                    <div className="flex flex-col sm:flex-row items-center gap-6 p-6 bg-gray-50/50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 rounded-2xl">
+                      <div className="w-20 h-20 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center bg-white dark:bg-black overflow-hidden shadow-inner shrink-0 scale-100 sm:scale-110">
+                        {formData.authorImage ? (
+                           <img src={formData.authorImage} alt="Author" className="w-full h-full object-cover" />
+                        ) : (
+                           <span className="text-gray-400 text-xs font-black">IMG</span>
+                        )}
+                      </div>
+                      <div className="flex-1 text-center sm:text-left">
+                         <input 
+                           type="file" 
+                           accept=".png,.jpg,.jpeg,.webp" 
+                           className="hidden" 
+                           id="author-upload"
+                           onChange={(e) => {
+                             const file = e.target.files?.[0];
+                             if (file) {
+                               const reader = new FileReader();
+                               reader.onloadend = () => {
+                                 setFormData(prev => ({ ...prev, authorImage: reader.result }));
+                               };
+                               reader.readAsDataURL(file);
+                             }
+                           }} 
+                         />
+                         <label htmlFor="author-upload" className="px-6 py-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/10 rounded-xl text-xs font-black cursor-pointer transition-all text-gray-700 dark:text-gray-300 inline-block active:scale-95 shadow-sm uppercase tracking-widest">
+                           Upload Avatar
+                         </label>
+                         <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-3 font-black uppercase tracking-widest">Displays natively alongside articles.</p>
+                      </div>
                     </div>
                   </div>
                 </div>

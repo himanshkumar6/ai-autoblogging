@@ -8,6 +8,8 @@ import Container from "@/components/Container";
 import GlassCard from "@/components/GlassCard";
 import ReadingProgress from "@/components/ReadingProgress";
 import AdSlot from "@/components/AdSlot";
+import SocialShare from "@/components/SocialShare";
+import AuthorAndShareBlock from "@/components/AuthorAndShareBlock";
 import { getAllSettings } from "@/app/actions/settings";
 
 interface Props {
@@ -140,34 +142,13 @@ export default async function BlogPostPage({ params }: Props) {
                   {post.meta_description}
                 </p>
 
-                {/* Author Block */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full py-6 sm:py-8 border-t border-b border-black/5 dark:border-white/5 gap-6">
-                  <div className="flex items-center gap-4 text-left justify-center sm:justify-start">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 p-0.5 flex items-center justify-center shadow-lg shrink-0">
-                       <div className="w-full h-full rounded-lg sm:rounded-[11px] bg-gradient-to-br from-accent-cyan via-accent-blue to-accent-purple flex items-center justify-center">
-                        <span className="text-white font-display font-black text-xs sm:text-sm tracking-tighter">Ai</span>
-                       </div>
-                    </div>
-                    <div>
-                      <p className="text-[9px] sm:text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest leading-none mb-1.5 flex items-center gap-2">
-                        Cyber Analyst
-                        <span className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
-                      </p>
-                      <p className="text-[8px] sm:text-[9px] text-gray-500 dark:text-white/30 font-bold tracking-widest uppercase font-display">Intelligence Engine</p>
-                    </div>
-                  </div>
-
-                  {/* Share Buttons */}
-                  <div className="flex items-center justify-center gap-2">
-                    <button className="flex items-center justify-center gap-2 px-4 py-2 sm:py-2.5 rounded-xl bg-black/5 dark:bg-white/5 text-gray-500 dark:text-white/40 hover:text-white hover:bg-black dark:hover:bg-white dark:hover:text-black transition-all font-black text-[9px] uppercase tracking-widest border border-transparent w-1/2 sm:w-auto" aria-label="Share on X">
-                       <Twitter size={14} />
-                      Share
-                    </button>
-                    <button className="p-2 sm:p-2.5 rounded-xl bg-black/5 dark:bg-white/5 text-gray-500 dark:text-white/40 hover:text-white hover:bg-black dark:hover:bg-white dark:hover:text-black transition-all border border-transparent flex justify-center w-1/2 sm:w-auto" aria-label="Copy Link">
-                      <LinkIcon size={14} />
-                    </button>
-                  </div>
-                </div>
+                {/* Author & Share Block (Client Component) */}
+                <AuthorAndShareBlock 
+                  authorName={settings.authorName}
+                  authorDesignation={settings.authorDesignation}
+                  authorImage={settings.authorImage}
+                  postTitle={post.title}
+                />
               </header>
 
               {post.image_url && (

@@ -108,7 +108,7 @@ export default function AdminSidebar({ userEmail }: { userEmail: string }) {
         <aside 
           className={`
             fixed top-0 left-0 h-screen transition-all duration-500 ease-in-out z-[70]
-            bg-white dark:bg-[#050505] border-r border-gray-200 dark:border-white/5 shadow-2xl
+            bg-white dark:bg-transparent border-r border-gray-200 dark:border-white/5 shadow-2xl
             flex flex-col
             ${isOpen ? "w-64 translate-x-0" : "-translate-x-full md:translate-x-0"}
             ${!isOpen ? "md:w-20 lg:w-64" : "w-64"}

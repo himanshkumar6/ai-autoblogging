@@ -28,14 +28,13 @@ export default async function DashboardLayout({
 
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#050505] text-gray-900 dark:text-white selection:bg-purple-500/30">
+    <div className="min-h-screen text-gray-900 dark:text-white selection:bg-purple-500/30 w-full overflow-hidden relative">
       
-      {/* 1. Global Background System */}
-      <div className="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
-        {/* Animated deep space gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-100 via-white to-gray-50 dark:from-black dark:via-[#0b0b1a] dark:to-[#1a1a2e]" />
-        
-        {/* Subtle glowing mesh overlays */}
+      {/* 1. Global Background System - Tied definitively to the root wrapper! */}
+      <div className="fixed top-0 left-0 w-screen h-screen bg-gradient-to-br from-gray-100 via-white to-gray-50 dark:from-[#050505] dark:via-[#0b0b1a] dark:to-[#1a1a2e] -z-50 pointer-events-none" />
+      
+      {/* Ambient glow mesh locked definitively to screen size */}
+      <div className="fixed top-0 left-0 w-screen h-screen -z-40 pointer-events-none overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-purple-600/5 dark:bg-purple-600/10 blur-[120px] animate-pulse duration-[10000ms]" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/5 dark:bg-blue-600/10 blur-[120px] animate-pulse duration-[8000ms]" />
       </div>
@@ -46,7 +45,7 @@ export default async function DashboardLayout({
       {/* 3. Fixed Sidebar Component */}
       <AdminSidebar userEmail={safeUser?.email || ""} />
 
-      {/* 4. Main Content Area */}
+      {/* 5. Main Content Area */}
       {/* 
           Responsive Margin Rules:
           - ml-0 (Mobile): Overlay sidebar

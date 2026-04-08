@@ -1,11 +1,24 @@
 import { getSupabaseAdmin } from "./supabase-admin";
 
 /**
+ * Valid known steps for the pipeline logging system.
+ */
+export type StepType = 
+  | "trend" 
+  | "research" 
+  | "outline" 
+  | "generate" 
+  | "generate_image"
+  | "save" 
+  | "tweet";
+
+/**
  * Non-blocking logger for system steps.
  * Uses a fire-and-forget approach to avoid slowing down the main pipeline.
+ * Allows valid StepType values, while allowing fallback arbitrary strings safely.
  */
 export function logStep(
-  step: "trend" | "research" | "outline" | "generate" | "save" | "tweet",
+  step: StepType | (string & {}),
   status: "success" | "fail",
   message?: string,
   metadata: Record<string, any> = {}

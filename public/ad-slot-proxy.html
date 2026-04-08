@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>Ad Slot Proxy</title>
+    <style>
+        html {
+            overflow: hidden; /* Prevent scrollbars from popping up during scaling */
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: transparent !important;
+            width: 100%;
+            height: auto; 
+            --ad-text: #f8f8f8; /* Default to dark mode text */
+            color: var(--ad-text) !important;
+        }
+        body {
+            /* Standard block flow to prevent crashing native ad DOM scripts */
+            text-align: center;
+            transform-origin: top left; /* Origin must be top-left to prevent left-side void on overflow scaling */
+        }
+        #ad-target {
+            margin: 0 auto;
+            display: inline-block;
+            text-align: left; /* Reset inner text spacing */
+        }
+        /* Target structural wrappers to override hardcoded templates, preserving inner ad widgets */
+        #ad-target > div, #ad-target > iframe {
+            background-color: transparent !important;
+        }
+        #ad-target span, #ad-target a, #ad-target p {
+            color: var(--ad-text) !important;
+        }
+        /* Center common ad containers and ensure absolute transparency */
+        div[id^="container-"], .ad-unit, iframe {
+            margin: 0 auto !important;
+            background-color: transparent !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="ad-target"></div>
+
+    <script>
+        try {
+            const applyThemeAndInit = () => {
+                const hash = window.location.hash.substring(1);
+                if (!hash) return;
+                
+                const decodedText = decodeURIComponent(escape(atob(hash)));
+                
+                let adCode = decodedText;
+                let slotId = "global";
+                let adTheme = "dark";
+
+                // Attempt to parse as JSON for isolated slot routing
+                try {
+                    const parsed = JSON.parse(decodedText);
+                    if (parsed.code && parsed.id) {
+                        adCode = parsed.code;
+                        slotId = parsed.id;
+                        if (parsed.theme) adTheme = parsed.theme;
+                    }
+                } catch (e) {
+                    // Fallback
+                }
+
+                // Force layout colors mathematically before rendering via CSS Variable Clamp
+                if (adTheme === 'light') {
+                    document.body.style.setProperty('--ad-text', '#080808');
+                } else {
+                    document.body.style.setProperty('--ad-text', '#f8f8f8');
+                }
+
+                return { adCode, slotId };
+            };
+
+            const config = applyThemeAndInit();
+            
+            if (config) {
+                const { adCode, slotId } = config;
+                const target = document.getElementById('ad-target');
+                target.innerHTML = adCode;
+                
+                // Manually execute scripts
+                const scripts = target.querySelectorAll('script');
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement('script');
+                    Array.from(oldScript.attributes).forEach(attr => {
+                        newScript.setAttribute(attr.name, attr.value);
+                    });
+                    if (oldScript.innerHTML) {
+                        newScript.innerHTML = oldScript.innerHTML;
+                    }
+                    document.body.appendChild(newScript);
+                });
+
+                // Auto-Resize & Responsive Universal Scaler Engine
+                let lastReportedHeight = 0;
+                let resizeTimeout;
+
+                const reportHeightAndScale = () => {
+                    // Temporarily disable transform to measure the TRUE raw layout sizes
+                    // Executing this synchronously prevents the browser from actually painting the flicker
+                    document.body.style.transform = 'none';
+                    
+                    // Measure true unbounded dimensions
+                    const rawWidth = Math.max(document.body.scrollWidth, document.documentElement.scrollWidth); 
+                    const winWidth = window.innerWidth;
+                    
+                    let scale = 1;
+                    // If ad visually overflows mobile width, shrink it perfectly
+                    if (rawWidth > winWidth && winWidth > 0 && rawWidth > 0) {
+                        scale = winWidth / rawWidth;
+                        document.body.style.transform = `scale(${scale})`;
+                    } else {
+                        document.body.style.transform = 'none';
+                    }
+
+                    // Measure natural unbounded height
+                    const rawHeight = Math.max(
+                        document.body.scrollHeight,
+                        document.documentElement.scrollHeight,
+                        document.body.offsetHeight,
+                        target.offsetHeight
+                    );
+
+                    // True visual height incorporates our mobile shrinkage ratio
+                    const visualHeight = rawHeight * scale;
+
+                    // Only dispatch to React if height strictly changed (prevents re-render loops)
+                    if (visualHeight > 10 && Math.abs(lastReportedHeight - visualHeight) > 1) {
+                        lastReportedHeight = visualHeight;
+                        window.parent.postMessage({ type: 'AD_RESIZE', height: visualHeight, id: slotId }, window.location.origin);
+                    }
+                };
+
+                // Watch for dynamically loaded Adsterra frames and content
+                const observer = new MutationObserver((mutations) => {
+                    let hasSignificantChange = false;
+                    for (let m of mutations) {
+                        // Ignore our own scaling engine applying the CSS transform
+                        if (m.target === document.body && m.attributeName === 'style') {
+                            continue;
+                        }
+                        hasSignificantChange = true;
+                    }
+                    
+                    if (hasSignificantChange) {
+                        clearTimeout(resizeTimeout);
+                        resizeTimeout = setTimeout(reportHeightAndScale, 50);
+                    }
+                });
+                observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+                
+                window.addEventListener('load', reportHeightAndScale);
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(reportHeightAndScale, 50);
+                });
+                setInterval(reportHeightAndScale, 1000); // Polling layout stabilizer
+            }
+        } catch (e) {
+            console.error('Ad Proxy Error:', e);
+        }
+    </script>
+</body>
+</html>

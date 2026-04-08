@@ -7,7 +7,7 @@ import GlobalLoader from "@/components/GlobalLoader";
 
 import { getAllSettings } from "@/app/actions/settings";
 import Script from "next/script";
-import AdRenderer from "@/components/AdRenderer";
+import AdSlot from "@/components/AdSlot";
 
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin"], display: "swap", variable: "--font-playfair" });
@@ -18,6 +18,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const meta: Metadata = {
     title: settings.siteName || "Crypto News",
     description: settings.siteDescription || "AI Powered Crypto Insights & Technical Analysis",
+    other: {
+      monetag: "cd4e6eaff050723852017d532769ba46"
+    }
   };
 
   if (settings.faviconData) {
@@ -39,8 +42,8 @@ export default async function RootLayout({
   const settings = await getAllSettings();
 
   return (
-    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
-      <body className={`${inter.variable} ${playfair.variable} ${ptSerif.variable} font-sans min-h-screen antialiased selection:bg-accent-blue selection:text-white flex flex-col relative`}>
+    <html lang="en" className="scroll-smooth bg-[#f8fafc] dark:bg-[#020617]" suppressHydrationWarning>
+      <body className={`${inter.variable} ${playfair.variable} ${ptSerif.variable} font-sans min-h-screen w-full antialiased selection:bg-accent-blue selection:text-white flex flex-col relative bg-transparent dark:bg-[#020617] overflow-x-hidden m-0 p-0`}>
         {/* Google Analytics 4 Injection */}
         {settings.ga4Id && (
           <>
@@ -59,7 +62,7 @@ export default async function RootLayout({
 
 
         <Providers>
-          <div className="fixed inset-0 -z-20 bg-gradient-to-br from-[#020617] via-[#09090b] to-[#1e1b4b] dark:opacity-100 opacity-0 transition-opacity duration-1000" />
+          <div className="fixed inset-0 -z-20 bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0] dark:from-[#020617] dark:via-[#09090b] dark:to-[#020617] transition-opacity duration-1000 w-full h-full" />
           
           <GlobalLoader>
             <LayoutWrapper>
@@ -69,10 +72,9 @@ export default async function RootLayout({
         </Providers>
 
         {/* Global Social Bar / Overlay Ad */}
-        <AdRenderer 
-          adCode={settings.ads?.ad_social_bar || '<script src="https://horizontallyresearchpolar.com/68/1e/2f/681e2f7e5b96910cbd13d51ff80c521f.js"></script>'} 
-          className="!my-0 h-0 overflow-hidden" 
-        />
+        <div className="bg-transparent dark:bg-transparent w-full m-0 p-0">
+          <AdSlot adCode={settings.ads?.ad_social_bar} className="!my-0 !bg-transparent dark:!bg-transparent" />
+        </div>
       </body>
     </html>
   );

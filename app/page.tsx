@@ -3,7 +3,7 @@ import Container from "@/components/Container";
 import BlogCard from "@/components/BlogCard";
 import Sidebar from "@/components/Sidebar";
 import HeroButtons from "@/components/HeroButtons";
-import AdRenderer from "@/components/AdRenderer";
+import AdSlot from "@/components/AdSlot";
 import { getAllSettings } from "./actions/settings";
 
 import Pagination from "@/components/Pagination";
@@ -43,9 +43,7 @@ export default async function Home({ searchParams }: Props) {
     console.error("Error fetching posts:", error);
   }
 
-  // Pre-configured Ad Codes from the user
-  const userNativeBanner = `<script async="async" data-cfasync="false" src="https://horizontallyresearchpolar.com/d352949af32948eb11532ac581006533/invoke.js"></script><div id="container-d352949af32948eb11532ac581006533"></div>`;
-  const userStandardBanner = `<script type="text/javascript">atOptions = {'key' : '5c6a2c2084c718a240683017260b60','format' : 'iframe','height' : 250,'width' : 300,'params' : {}};</script><script type="text/javascript" src="//www.highperformanceformat.com/5c6a2c2084c718a240683017260b60/invoke.js"></script>`;
+
 
   return (
     <>
@@ -75,10 +73,12 @@ export default async function Home({ searchParams }: Props) {
               <HeroButtons />
             </div>
 
-            {/* 1. TOP AD PLACEMENT: Below Buttons */}
-            <div className="ad-container mt-12 mb-4 w-full flex justify-center min-h-[90px]">
-              <AdRenderer adCode={settings.ads?.ad_top_banner || userNativeBanner} />
+            {/* TOP AD PLACEMENT */}
+            <div className="mt-20 w-full flex justify-center min-h-[90px]">
+              <AdSlot adCode={settings.ads?.ad_top_banner} minHeight="90px" />
             </div>
+
+
           </div>
         </Container>
       </section>
@@ -121,9 +121,9 @@ export default async function Home({ searchParams }: Props) {
               </div>
             )}
 
-            {/* 3. BOTTOM AD PLACEMENT */}
-            <div className="ad-container mt-12 mb-8 flex justify-center w-full">
-              <AdRenderer adCode={settings.ads?.ad_bottom_banner} />
+            {/* BOTTOM AD PLACEMENT */}
+            <div className="mt-12 mb-8 flex justify-center w-full min-h-[90px]">
+              <AdSlot adCode={settings.ads?.ad_bottom_banner} minHeight="90px" />
             </div>
           </div>
 
@@ -131,7 +131,7 @@ export default async function Home({ searchParams }: Props) {
           <div className="w-full lg:w-[300px]">
             <Sidebar 
               trendingPosts={posts ? posts.slice(0, 4) : []} 
-              adCode={settings.ads?.ad_mid_content || userStandardBanner}
+              adCode={settings.ads?.ad_sidebar}
             />
           </div>
         </div>

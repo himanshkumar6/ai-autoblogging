@@ -7,7 +7,7 @@ import { ArrowLeft, Twitter, Linkedin, Link as LinkIcon, Share2, Image as ImageI
 import Container from "@/components/Container";
 import GlassCard from "@/components/GlassCard";
 import ReadingProgress from "@/components/ReadingProgress";
-import AdRenderer from "@/components/AdRenderer";
+import AdSlot from "@/components/AdSlot";
 import { getAllSettings } from "@/app/actions/settings";
 
 interface Props {
@@ -90,13 +90,13 @@ export default async function BlogPostPage({ params }: Props) {
       <Container>
 
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-12 items-start">
-          <div className="min-w-0">
+        <div className="max-w-4xl lg:max-w-none mx-auto grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 lg:gap-12 items-start w-full">
+          <div className="min-w-0 w-full">
             {/* Navigation & Back Link */}
-            <div className="mb-8 px-4 sm:px-0">
+            <div className="mb-6 lg:mb-8 px-2 sm:px-0">
               <Link 
                 href="/" 
-                className="group inline-flex items-center text-sm font-semibold text-secondary hover:text-accent-cyan transition-colors"
+                className="group inline-flex items-center text-xs sm:text-sm font-semibold text-secondary hover:text-accent-cyan transition-colors"
               >
                 <div className="p-2 rounded-full bg-white/5 border border-white/5 group-hover:bg-accent-cyan/10 group-hover:border-accent-cyan/30 transition-colors mr-3">
                   <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
@@ -105,17 +105,20 @@ export default async function BlogPostPage({ params }: Props) {
               </Link>
             </div>
 
-            {/* 1. TOP AD PLACEMENT: Above Article Card */}
-            <AdRenderer adCode={settings.ads?.ad_top_banner} className="mb-8" />
 
-            <GlassCard className="p-6 sm:p-8 md:p-12 border-t border-b sm:border border-black/5 dark:border-white/5 !bg-white/40 dark:!bg-[#0a0a0f]/40 backdrop-blur-3xl shadow-2xl overflow-hidden">
+
+            <GlassCard className="p-5 sm:p-8 md:p-12 border-t border-b sm:border border-black/5 dark:border-white/5 !bg-white/40 dark:!bg-[#0a0a0f]/40 backdrop-blur-3xl shadow-2xl overflow-hidden w-full max-w-full">
+              {/* TOP AD PLACEMENT */}
+            <div className="mb-8 w-full flex justify-center">
+               <AdSlot adCode={settings.ads?.ad_top_banner} minHeight="90px" />
+            </div>
               {/* Article Header */}
-              <header className="mb-12 flex flex-col items-center text-center">
-                <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-3 text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] mb-8">
+              <header className="mb-10 sm:mb-12 flex flex-col items-center text-center">
+                <div className="flex flex-wrap items-center justify-center gap-x-3 sm:gap-x-4 gap-y-2 text-[9px] sm:text-[11px] font-black uppercase tracking-[0.2em] mb-6 sm:mb-8 text-center">
                   <span className="px-3 py-1.5 rounded-lg bg-accent-cyan/10 text-accent-cyan border border-accent-cyan/20">
                     Market Intel
                   </span>
-                  <span className="text-gray-300 dark:text-white/20">/</span>
+                  <span className="hidden sm:inline text-gray-300 dark:text-white/20">/</span>
                   <time dateTime={post.created_at} className="text-gray-700 dark:text-white/40">
                     {new Date(post.created_at).toLocaleDateString("en-US", {
                       month: "short",
@@ -123,44 +126,44 @@ export default async function BlogPostPage({ params }: Props) {
                       year: "numeric"
                     })}
                   </time>
-                  <span className="text-gray-300 dark:text-white/20">/</span>
-                  <span className="text-accent-blue font-black">
+                  <span className="hidden sm:inline text-gray-300 dark:text-white/20">/</span>
+                  <span className="text-accent-blue font-black w-full sm:w-auto mt-2 sm:mt-0">
                     {readTime} min read
                   </span>
                 </div>
 
-                <h1 className="text-3xl sm:text-5xl lg:text-7xl font-display font-black text-gray-900 dark:text-white tracking-tighter leading-[0.95] mb-8 text-balance">
+                <h1 className="text-3xl sm:text-5xl lg:text-7xl font-display font-black text-gray-900 dark:text-white tracking-tighter leading-[1.1] sm:leading-[0.95] mb-6 sm:mb-8 text-balance break-words w-full px-2 sm:px-0">
                   {post.title}
                 </h1>
                 
-                <p className="text-base sm:text-lg text-gray-700 dark:text-white/40 italic leading-relaxed mb-10 mx-auto max-w-2xl px-4 sm:px-0">
+                <p className="text-sm sm:text-base md:text-lg text-gray-700 dark:text-white/40 italic leading-relaxed mb-8 sm:mb-10 mx-auto max-w-2xl px-2 sm:px-0 text-balance">
                   {post.meta_description}
                 </p>
 
                 {/* Author Block */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full py-8 border-t border-b border-black/5 dark:border-white/5 gap-6">
-                  <div className="flex items-center gap-4 text-left">
-                    <div className="w-12 h-12 rounded-xl bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 p-0.5 flex items-center justify-center shadow-lg shrink-0">
-                       <div className="w-full h-full rounded-[11px] bg-gradient-to-br from-accent-cyan via-accent-blue to-accent-purple flex items-center justify-center">
-                        <span className="text-white font-display font-black text-sm tracking-tighter">Ai</span>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full py-6 sm:py-8 border-t border-b border-black/5 dark:border-white/5 gap-6">
+                  <div className="flex items-center gap-4 text-left justify-center sm:justify-start">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 p-0.5 flex items-center justify-center shadow-lg shrink-0">
+                       <div className="w-full h-full rounded-lg sm:rounded-[11px] bg-gradient-to-br from-accent-cyan via-accent-blue to-accent-purple flex items-center justify-center">
+                        <span className="text-white font-display font-black text-xs sm:text-sm tracking-tighter">Ai</span>
                        </div>
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest leading-none mb-1 flex items-center gap-2">
+                      <p className="text-[9px] sm:text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest leading-none mb-1.5 flex items-center gap-2">
                         Cyber Analyst
                         <span className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
                       </p>
-                      <p className="text-[9px] text-gray-500 dark:text-white/30 font-bold tracking-widest uppercase font-display">Intelligence Engine</p>
+                      <p className="text-[8px] sm:text-[9px] text-gray-500 dark:text-white/30 font-bold tracking-widest uppercase font-display">Intelligence Engine</p>
                     </div>
                   </div>
 
                   {/* Share Buttons */}
-                  <div className="flex items-center gap-2">
-                    <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 text-gray-500 dark:text-white/40 hover:text-white hover:bg-black dark:hover:bg-white dark:hover:text-black transition-all font-black text-[9px] uppercase tracking-widest border border-transparent" aria-label="Share on X">
+                  <div className="flex items-center justify-center gap-2">
+                    <button className="flex items-center justify-center gap-2 px-4 py-2 sm:py-2.5 rounded-xl bg-black/5 dark:bg-white/5 text-gray-500 dark:text-white/40 hover:text-white hover:bg-black dark:hover:bg-white dark:hover:text-black transition-all font-black text-[9px] uppercase tracking-widest border border-transparent w-1/2 sm:w-auto" aria-label="Share on X">
                        <Twitter size={14} />
                       Share
                     </button>
-                    <button className="p-2.5 rounded-xl bg-black/5 dark:bg-white/5 text-gray-500 dark:text-white/40 hover:text-white hover:bg-black dark:hover:bg-white dark:hover:text-black transition-all border border-transparent" aria-label="Copy Link">
+                    <button className="p-2 sm:p-2.5 rounded-xl bg-black/5 dark:bg-white/5 text-gray-500 dark:text-white/40 hover:text-white hover:bg-black dark:hover:bg-white dark:hover:text-black transition-all border border-transparent flex justify-center w-1/2 sm:w-auto" aria-label="Copy Link">
                       <LinkIcon size={14} />
                     </button>
                   </div>
@@ -168,7 +171,7 @@ export default async function BlogPostPage({ params }: Props) {
               </header>
 
               {post.image_url && (
-                <div className="relative w-full aspect-[16/9] mb-12 overflow-hidden bg-white/5 rounded-[1.5rem] sm:rounded-[2rem] border border-black/5 dark:border-white/5 shadow-2xl mx-[-1.5rem] sm:mx-0 sm:w-auto">
+                <div className="relative w-full aspect-[16/9] mb-8 sm:mb-12 overflow-hidden bg-white/5 rounded-xl sm:rounded-[2rem] border border-black/5 dark:border-white/5 shadow-2xl">
                   <Image 
                     src={post.image_url} 
                     alt={post.title} 
@@ -183,28 +186,39 @@ export default async function BlogPostPage({ params }: Props) {
 
               {/* Article Body Content */}
               <div 
-                className="prose prose-base sm:prose-lg mx-auto dark:prose-invert font-body
+                className="prose prose-sm sm:prose-base lg:prose-lg mx-auto dark:prose-invert font-body
                            prose-headings:font-display prose-headings:font-black prose-headings:tracking-tighter prose-headings:text-gray-900 dark:prose-headings:text-white
-                           prose-p:text-gray-800 dark:prose-p:text-white/70 prose-p:leading-[1.7]
+                           prose-p:text-gray-800 dark:prose-p:text-white/70 prose-p:leading-[1.6] sm:prose-p:leading-[1.7]
                            prose-strong:text-gray-900 dark:prose-strong:text-white
                            prose-a:text-accent-cyan hover:prose-a:text-accent-blue prose-a:no-underline
-                           prose-img:rounded-[1.5rem] sm:prose-img:rounded-[2.5rem] prose-img:shadow-2xl
-                           editorial-content"
+                           prose-img:rounded-xl sm:prose-img:rounded-[2.5rem] prose-img:shadow-2xl
+                           editorial-content break-words w-full max-w-none"
               >
                 <div dangerouslySetInnerHTML={{ __html: contentHead }} />
                 
+                {/* MID-CONTENT AD INJECTION */}
+                {contentTail && settings.ads?.ad_mid_content && (
+                  <div className="my-8 sm:my-12 py-6 sm:py-8 border-y border-black/5 dark:border-white/5 flex justify-center w-full overflow-hidden">
+                    <AdSlot adCode={settings.ads.ad_mid_content} minHeight="250px" />
+                  </div>
+                )}
+
                 {contentTail && <div dangerouslySetInnerHTML={{ __html: contentTail }} />}
               </div>
 
-              {/* 3. BOTTOM AD PLACEMENT: End of Article */}
-              <AdRenderer adCode={settings.ads?.ad_bottom_banner} className="mt-12 pt-10 border-t border-black/5 dark:border-white/5" />
+              {/* BOTTOM AD PLACEMENT */}
+              <div className="mt-10 sm:mt-12 pt-8 sm:pt-10 border-t border-black/5 dark:border-white/5 w-full flex justify-center">
+                <AdSlot adCode={settings.ads?.ad_bottom_banner} minHeight="90px" />
+              </div>
+
+
             </GlassCard>
           </div>
 
           <div className="w-full lg:w-[300px]">
             <Sidebar 
               trendingPosts={trendingPosts || []}
-              adCode={settings.ads?.ad_sidebar_top}
+              adCode={settings.ads?.ad_sidebar}
             />
           </div>
         </div>

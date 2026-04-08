@@ -35,15 +35,11 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Rec
     faviconData: initialSettings.faviconData || "",
     ga4Id: initialSettings.ga4Id || "",
     customHeadScripts: initialSettings.customHeadScripts || "",
-    googleAdSensePublisherId: initialSettings.googleAdSensePublisherId || "",
     ads: initialSettings.ads || {
       ad_top_banner: "",
       ad_mid_content: "",
       ad_bottom_banner: "",
-      ad_sidebar_top: "",
-      ad_sidebar_bottom: "",
-      ad_between_posts: "",
-      ad_native_banner: "",
+      ad_sidebar: "",
       ad_social_bar: "",
     },
     aiApiKey: initialSettings.aiApiKey || "",
@@ -221,128 +217,55 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Rec
             </motion.div>
           )}
 
+
+
           {activeTab === "ads" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-10">
               <div className="border-b border-gray-100 dark:border-white/5 pb-6">
                 <h2 className="text-2xl font-black text-gray-900 dark:text-white flex items-center gap-3 leading-tight"><Code size={28} className="text-purple-500"/> Ads Configuration</h2>
-                <p className="text-gray-500 dark:text-white/40 text-sm font-bold mt-2 ml-[40px]">Manage and organize your Adsterra ad codes across the site.</p>
+                <p className="text-gray-500 dark:text-white/40 text-sm font-bold mt-2 ml-[40px]">Manage your ad units with a clean, grid-based interface.</p>
               </div>
 
-              {/* Banner Ads Group */}
-              <div className="p-6 md:p-8 border border-purple-200 dark:border-purple-500/20 bg-purple-50/30 dark:bg-purple-500/5 rounded-3xl space-y-8">
-                <h3 className="font-black text-purple-900 dark:text-purple-100 flex items-center gap-3 uppercase tracking-widest text-xs"><Layout size={18}/> Banner Ads</h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em]">Top Banner Ad</label>
-                    <textarea 
-                      name="ads.ad_top_banner" 
-                      rows={3} 
-                      value={formData.ads.ad_top_banner} 
-                      onChange={handleChange} 
-                      placeholder="Paste Adsterra code here"
-                      className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold placeholder:text-gray-300 dark:placeholder:text-white/5" 
-                    />
-                    <p className="text-[9px] text-gray-400 dark:text-white/20 font-bold italic">Renders at the very top of the article/home page.</p>
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Banner Ads */}
+                <div className="p-6 border border-purple-200 dark:border-purple-500/20 bg-purple-50/30 dark:bg-purple-500/5 rounded-3xl space-y-6">
+                  <h3 className="font-black text-[10px] uppercase tracking-widest text-purple-700 dark:text-purple-400">Primary Banner Placements</h3>
                   
-                  <div className="space-y-2">
-                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em]">Mid-Content Ad</label>
-                    <textarea 
-                      name="ads.ad_mid_content" 
-                      rows={3} 
-                      value={formData.ads.ad_mid_content} 
-                      onChange={handleChange} 
-                      placeholder="Paste Adsterra code here"
-                      className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold placeholder:text-gray-300 dark:placeholder:text-white/5" 
-                    />
-                    <p className="text-[9px] text-gray-400 dark:text-white/20 font-bold italic">Renders inside the article content body.</p>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2">Top Banner (Hero)</label>
+                      <textarea name="ads.ad_top_banner" rows={3} value={formData.ads.ad_top_banner} onChange={handleChange} placeholder="Paste ad code..." className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-4 py-3 outline-none focus:border-purple-500 transition-all" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2">Bottom Banner (Footer)</label>
+                      <textarea name="ads.ad_bottom_banner" rows={3} value={formData.ads.ad_bottom_banner} onChange={handleChange} placeholder="Paste ad code..." className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-4 py-3 outline-none focus:border-purple-500 transition-all" />
+                    </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em]">Bottom Banner Ad</label>
-                    <textarea 
-                      name="ads.ad_bottom_banner" 
-                      rows={3} 
-                      value={formData.ads.ad_bottom_banner} 
-                      onChange={handleChange} 
-                      placeholder="Paste Adsterra code here"
-                      className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold placeholder:text-gray-300 dark:placeholder:text-white/5" 
-                    />
-                    <p className="text-[9px] text-gray-400 dark:text-white/20 font-bold italic">Renders after the main content feed.</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em]">Between Posts Ad</label>
-                    <textarea 
-                      name="ads.ad_between_posts" 
-                      rows={3} 
-                      value={formData.ads.ad_between_posts} 
-                      onChange={handleChange} 
-                      placeholder="Paste Adsterra code here"
-                      className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold placeholder:text-gray-300 dark:placeholder:text-white/5" 
-                    />
-                    <p className="text-[9px] text-gray-400 dark:text-white/20 font-bold italic">Renders between blog cards in the feed.</p>
+                {/* Sidebar & Special */}
+                <div className="p-6 border border-blue-200 dark:border-blue-500/20 bg-blue-50/30 dark:bg-blue-500/5 rounded-3xl space-y-6">
+                  <h3 className="font-black text-[10px] uppercase tracking-widest text-blue-700 dark:text-blue-400">Sidebar & Global Overlays</h3>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2">Sidebar Slot</label>
+                      <textarea name="ads.ad_sidebar" rows={3} value={formData.ads.ad_sidebar} onChange={handleChange} placeholder="Paste ad code..." className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-blue-200 dark:border-blue-500/20 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2">Social Bar / Global Overlay</label>
+                      <textarea name="ads.ad_social_bar" rows={3} value={formData.ads.ad_social_bar} onChange={handleChange} placeholder="Paste global script..." className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-blue-200 dark:border-blue-500/20 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all" />
+                    </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em]">Sidebar Top Ad</label>
-                    <textarea 
-                      name="ads.ad_sidebar_top" 
-                      rows={3} 
-                      value={formData.ads.ad_sidebar_top} 
-                      onChange={handleChange} 
-                      placeholder="Paste Adsterra code here"
-                      className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold placeholder:text-gray-300 dark:placeholder:text-white/5" 
-                    />
+                {/* Article Specific */}
+                <div className="md:col-span-2 p-6 border border-orange-200 dark:border-orange-500/20 bg-orange-50/30 dark:bg-orange-500/5 rounded-3xl space-y-6">
+                  <h3 className="font-black text-[10px] uppercase tracking-widest text-orange-700 dark:text-orange-400">Article Content Injection</h3>
+                  <div>
+                    <label className="block text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2">Mid-Content Ad (Appears between paragraphs)</label>
+                    <textarea name="ads.ad_mid_content" rows={4} value={formData.ads.ad_mid_content} onChange={handleChange} placeholder="Paste native/mid-content ad code..." className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-orange-200 dark:border-orange-500/20 rounded-xl px-4 py-4 outline-none focus:border-orange-500 transition-all" />
                   </div>
-
-                  <div className="space-y-2">
-                    <label className="block text-[10px] font-black text-purple-700 dark:text-purple-400 uppercase tracking-[0.2em]">Sidebar Bottom Ad</label>
-                    <textarea 
-                      name="ads.ad_sidebar_bottom" 
-                      rows={3} 
-                      value={formData.ads.ad_sidebar_bottom} 
-                      onChange={handleChange} 
-                      placeholder="Paste Adsterra code here"
-                      className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-purple-200 dark:border-purple-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 transition-all font-bold placeholder:text-gray-300 dark:placeholder:text-white/5" 
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Native Ads Group */}
-              <div className="p-6 md:p-8 border border-blue-200 dark:border-blue-500/20 bg-blue-50/30 dark:bg-blue-500/5 rounded-3xl space-y-8">
-                <h3 className="font-black text-blue-900 dark:text-blue-100 flex items-center gap-3 uppercase tracking-widest text-xs"><Activity size={18}/> Native Ads</h3>
-                
-                <div className="space-y-2">
-                  <label className="block text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-[0.2em]">Native Banner Ad</label>
-                  <textarea 
-                    name="ads.ad_native_banner" 
-                    rows={4} 
-                    value={formData.ads.ad_native_banner} 
-                    onChange={handleChange} 
-                    placeholder="Paste your Adsterra Native ad script here..."
-                    className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-blue-200 dark:border-blue-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-blue-500 transition-all font-bold placeholder:text-gray-300 dark:placeholder:text-white/5" 
-                  />
-                  <p className="text-[9px] text-gray-400 dark:text-white/20 font-bold italic">Standard native unit for highest editorial integration.</p>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="block text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-[0.2em]">Social Bar / Overlay Ad</label>
-                  <textarea 
-                    name="ads.ad_social_bar" 
-                    rows={3} 
-                    value={formData.ads.ad_social_bar} 
-                    onChange={handleChange} 
-                    placeholder="Paste Social Bar script here"
-                    className="w-full font-mono text-xs bg-white dark:bg-black/40 border border-blue-200 dark:border-blue-500/20 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-blue-500 transition-all font-bold placeholder:text-gray-300 dark:placeholder:text-white/5" 
-                  />
-                  <p className="text-[9px] text-gray-400 dark:text-white/20 font-bold italic">Floating/Sticky unit that appears globally.</p>
                 </div>
               </div>
             </motion.div>

@@ -16,14 +16,21 @@
   }
 
   .dark {
-    --bg-start: #0a0a0a;
-    --bg-end: #09090b;
-    /* Extra gradient deep stops can be added at the layout level */
+    --bg-start: #020617;
+    --bg-end: #020617;
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --glass-border: rgba(255, 255, 255, 0.08);
     --glass-bg: rgba(20, 20, 25, 0.4);
     --glass-bg-hover: rgba(40, 40, 50, 0.5);
+  }
+
+  html, body {
+    @apply m-0 p-0 text-balance h-full;
+  }
+
+  html.dark, .dark body {
+    background-color: #020617 !important;
   }
 }
 
@@ -96,9 +103,9 @@
 body {
   background-color: var(--bg-start);
   color: var(--text-primary);
-  /* The radial body gradient requested */
   background-image: radial-gradient(circle at top, var(--bg-start) 0%, var(--bg-end) 100%);
   background-attachment: fixed;
+  @apply flex flex-col min-h-screen w-full overflow-x-hidden;
 }
 
 

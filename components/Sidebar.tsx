@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import GlassCard from "./GlassCard";
-import AdRenderer from "./AdRenderer";
+import AdSlot from "./AdSlot";
 
 interface SidebarProps {
   trendingPosts?: any[];
@@ -52,9 +52,8 @@ export default function Sidebar({ trendingPosts = [], adCode }: SidebarProps) {
           )}
         </ul>
       </GlassCard>
-
       {/* Sidebar Ad Placement */}
-      <AdRenderer adCode={adCode} className="my-0" />
+      <AdSlot adCode={adCode} className="my-4" minHeight="600px" />
 
       {/* Newsletter Widget */}
       <GlassCard

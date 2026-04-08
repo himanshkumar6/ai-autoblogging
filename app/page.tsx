@@ -4,15 +4,37 @@ import BlogCard from "@/components/BlogCard";
 import Sidebar from "@/components/Sidebar";
 import HeroButtons from "@/components/HeroButtons";
 
+import Pagination from "@/components/Pagination";
+
 export const revalidate = 60; // Refresh page data every 60 seconds
 
-export default async function Home() {
+interface Props {
+  searchParams: { page?: string };
+}
+
+export default async function Home({ searchParams }: Props) {
+  const page = parseInt(searchParams.page || "1");
+  const postsPerPage = 6;
+  const from = (page - 1) * postsPerPage;
+  const to = from + postsPerPage - 1;
+
   const supabase = getSupabase();
+  
+  // 1. Fetch Paginated Posts
   const { data: posts, error } = await supabase
     .from("posts")
-    .select("id, title, slug, meta_description, content, created_at, tweeted")
+    .select("id, title, slug, meta_description, content, image_url, created_at, tweeted")
     .eq("published", true)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(from, to);
+
+  // 2. Fetch Total Count for Pagination
+  const { count } = await supabase
+    .from("posts")
+    .select("*", { count: "exact", head: true })
+    .eq("published", true);
+
+  const totalPages = Math.ceil((count || 0) / postsPerPage);
 
   if (error) {
     console.error("Error fetching posts:", error);
@@ -72,6 +94,9 @@ export default async function Home() {
                 ))
               )}
             </div>
+
+            {/* Pagination Controls */}
+            <Pagination currentPage={page} totalPages={totalPages} />
           </div>
 
           <Sidebar trendingPosts={posts ? posts.slice(0, 4) : []} />

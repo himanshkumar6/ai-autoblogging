@@ -7,12 +7,12 @@
 @layer base {
   :root {
     --bg-start: #f8fafc;
-    --bg-end: #e2e8f0;
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --glass-border: rgba(0, 0, 0, 0.1);
-    --glass-bg: rgba(255, 255, 255, 0.6);
-    --glass-bg-hover: rgba(255, 255, 255, 0.8);
+    --bg-end: #f1f5f9;
+    --text-primary: #020617; /* Darker slate for top contrast */
+    --text-secondary: #334155; /* Slate 700 for better secondary contrast */
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-bg-hover: rgba(255, 255, 255, 0.9);
   }
 
   .dark {

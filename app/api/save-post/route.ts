@@ -23,14 +23,17 @@ export async function POST(request: Request) {
 
     const supabaseAdmin = getSupabaseAdmin();
 
-    const { title, content, meta, published = true } = await request.json();
+    const { title, content, meta, image_url, published = true } = await request.json();
 
     if (!title || !content) {
       return NextResponse.json({ error: "Title and content are required" }, { status: 400 });
     }
 
-    let slug = generateSlug(title);
+    // Persist provided image_url (can be null in clean state)
+    const finalImageUrl = image_url || null;
 
+    let slug = generateSlug(title);
+    
     // Check for duplicate slug and append random suffix if needed
     const { data: existing } = await supabaseAdmin
       .from("posts")
@@ -42,6 +45,8 @@ export async function POST(request: Request) {
       slug = `${slug}-${Math.floor(Math.random() * 10000)}`;
     }
 
+    console.log(`[Save-Post] Persisting blog: ${title} with slug: ${slug}`);
+
     const { data: post, error: dbError } = await supabaseAdmin
       .from("posts")
       .insert([{
@@ -49,15 +54,19 @@ export async function POST(request: Request) {
         slug,
         content,
         meta_description: meta,
+        image_url: finalImageUrl,
         published,
         tweeted: false,
       }])
       .select()
       .single();
 
-    if (dbError) throw new Error(dbError.message);
+    if (dbError) {
+      console.error("[Save-Post] DB Error:", dbError.message);
+      throw new Error(`DB Error: ${dbError.message}`);
+    }
 
-    return NextResponse.json({ success: true, slug: post.slug });
+    return NextResponse.json({ success: true, slug: post.slug, post_id: post.id });
   } catch (error: any) {
     console.error("Error saving post:", error);
     return NextResponse.json({ error: error.message || "Failed to save post" }, { status: 500 });

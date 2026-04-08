@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-secondary text-sm font-medium text-center md:text-left">
-            © {new Date().getFullYear()} Crypto News. Autonomous AI Engine.
+           © {new Date().getFullYear()} Crypto News. Trusted Insights Daily.
           </div>
           <div className="flex gap-8 justify-center md:justify-end">
             <Link href="/privacy" className="text-sm text-secondary hover:text-accent-cyan transition-colors">Privacy</Link>

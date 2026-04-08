@@ -75,20 +75,6 @@ export default async function BlogPostPage({ params }: Props) {
 
         <GlassCard className="p-8 md:p-16 border-t border-b sm:border border-black/5 dark:border-white/5 !bg-white/40 dark:!bg-[#0a0a0f]/40 backdrop-blur-3xl shadow-2xl overflow-hidden">
           
-          {post.image_url && (
-            <div className="relative w-full aspect-[16/9] -mx-8 -mt-8 mb-16 md:-mx-16 md:-mt-16 overflow-hidden bg-white/5 border-b border-black/5 dark:border-white/5">
-              <Image 
-                src={post.image_url} 
-                alt={post.title} 
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1200px"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f]/80 via-transparent to-transparent opacity-80" />
-            </div>
-          )}
-
           {/* Article Header */}
           <header className="mb-16 flex flex-col items-center text-center">
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-3 text-[11px] font-black uppercase tracking-[0.2em] mb-10">
@@ -96,7 +82,7 @@ export default async function BlogPostPage({ params }: Props) {
                 Market Intel
               </span>
               <span className="text-gray-300 dark:text-white/20">/</span>
-              <time dateTime={post.created_at} className="text-gray-500 dark:text-white/40">
+              <time dateTime={post.created_at} className="text-gray-700 dark:text-white/40">
                 {new Date(post.created_at).toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
@@ -104,7 +90,7 @@ export default async function BlogPostPage({ params }: Props) {
                 })}
               </time>
               <span className="text-gray-300 dark:text-white/20">/</span>
-              <span className="text-accent-blue dark:text-accent-purple">
+              <span className="text-accent-blue dark:text-accent-purple font-black">
                 {readTime} min read
               </span>
             </div>
@@ -113,19 +99,19 @@ export default async function BlogPostPage({ params }: Props) {
               {post.title}
             </h1>
             
-            <p className="text-xl sm:text-2xl text-gray-500 dark:text-white/40 italic leading-relaxed mb-12 font-body font-medium tracking-tight text-center mx-auto max-w-2xl">
+            <p className="text-xl sm:text-2xl text-gray-700 dark:text-white/40 italic leading-relaxed mb-12 font-body font-medium tracking-tight text-center mx-auto max-w-2xl">
               {post.meta_description}
             </p>
 
             {/* Author Block */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between py-10 border-t border-b border-black/5 dark:border-white/5 gap-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full py-10 border-t border-b border-black/5 dark:border-white/5 gap-8">
               <div className="flex items-center gap-5">
                 <div className="w-16 h-16 rounded-2xl bg-white dark:bg-white/5 border border-black/5 dark:border-white/10 p-0.5 flex items-center justify-center shadow-xl">
                    <div className="w-full h-full rounded-[14px] bg-gradient-to-br from-accent-cyan via-accent-blue to-accent-purple flex items-center justify-center">
                     <span className="text-white font-display font-black text-xl tracking-tighter">Ai</span>
                    </div>
                 </div>
-                <div>
+                <div className="text-left">
                   <p className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest leading-none mb-2 flex items-center gap-2">
                     Cyber Analyst Model
                     <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
@@ -146,6 +132,20 @@ export default async function BlogPostPage({ params }: Props) {
               </div>
             </div>
           </header>
+
+          {post.image_url && (
+            <div className="relative w-full aspect-[16/9] mb-20 overflow-hidden bg-white/5 rounded-[2rem] border border-black/5 dark:border-white/5 shadow-2xl">
+              <Image 
+                src={post.image_url} 
+                alt={post.title} 
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1200px"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f]/80 via-transparent to-transparent opacity-80" />
+            </div>
+          )}
 
           {/* Article Body Content */}
           <div 

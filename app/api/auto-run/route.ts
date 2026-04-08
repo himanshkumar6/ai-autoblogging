@@ -3,42 +3,24 @@ import { headers } from "next/headers";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { logStep } from "@/lib/logger";
 import { withRetry } from "@/lib/ai-retry";
-import { generateImage } from "@/lib/image";
-
-const topics = [
-  "Bitcoin price prediction",
-  "Top trending cryptocurrencies today",
-  "Best side hustles in 2026",
-  "AI tools for making money",
-  "Personal finance tips for beginners",
-];
-
-function generateSlug(title: string) {
-  return title
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .trim();
-}
+import { getTrendingTopic } from "@/lib/trending";
 
 export async function GET(request: Request) {
   headers(); 
-  const supabase = getSupabaseAdmin();
   const { origin: baseUrl } = new URL(request.url);
 
   try {
-    // 1. Pick a topic (Soon to be dynamic Trend)
-    const topic = topics[Math.floor(Math.random() * topics.length)];
+    // 1. Dynamic Topic Selection
+    const topic = await getTrendingTopic();
     const logMetadata: Record<string, any> = { topic };
     const internalHeaders = {
       "Content-Type": "application/json",
       "x-internal-secret": process.env.INTERNAL_API_SECRET || "",
     };
 
-    // 2. Generate Blog Post with Retry
-    console.log(`[Auto-Run] Starting generation for: ${topic}`);
+    console.log(`[Auto-Run] Orchestrating pipeline for: ${topic}`);
     
+    // 2. Generate Content & Image (Consolidated)
     const postData = await withRetry(async () => {
       const response = await fetch(`${baseUrl}/api/generate-post`, {
         method: "POST",
@@ -55,53 +37,30 @@ export async function GET(request: Request) {
 
     logStep("generate", "success", `Generated post: ${postData.title}`, logMetadata);
 
-    // 2.5 Generate Image
-    console.log(`[Auto-Run] Generating image for: ${topic}`);
-    let imageUrl = "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1600&q=80"; // fallback
-    try {
-      if (postData.image?.prompt) {
-        imageUrl = await generateImage(postData.image.prompt, postData.image.negative_prompt);
-        logStep("generate_image", "success", "Generated AI cover image", logMetadata);
-      }
-    } catch (imgError: any) {
-      console.warn(`[Auto-Run] Image generation failed, using fallback. Error: ${imgError.message}`);
-      logStep("generate_image", "fail", imgError.message, logMetadata);
-    }
-
-    // 3. Save to Supabase (Observability Step)
-    const slug = generateSlug(postData.title);
-    logMetadata["slug"] = slug;
-
-    const { data: insertedPost, error: insertError } = await supabase
-      .from("posts")
-      .insert([
-        {
+    // 3. Persist to Database (Centralized Logic)
+    const saveResult = await withRetry(async () => {
+      const response = await fetch(`${baseUrl}/api/save-post`, {
+        method: "POST",
+        headers: internalHeaders,
+        body: JSON.stringify({
           title: postData.title,
-          slug: slug,
           content: postData.content,
-          meta_description: postData.meta_description || postData.meta,
-          image_url: imageUrl,
-        },
-      ])
-      .select()
-      .single();
+          meta: postData.meta_description,
+          image_url: postData.image_url,
+          published: true
+        }),
+      });
 
-    if (insertError) {
-      if (insertError.code === "23505") {
-        const newSlug = `${slug}-${Math.floor(Math.random() * 10000)}`;
-        const { error: retryError } = await supabase
-          .from("posts")
-          .insert([{ title: postData.title, slug: newSlug, content: postData.content, meta_description: postData.meta_description || postData.meta, image_url: imageUrl }]);
-        
-        if (retryError) throw new Error(`DB collision handling failed: ${retryError.message}`);
-        logStep("save", "success", "Saved post with collision slug", logMetadata);
-      } else {
-        logStep("save", "fail", insertError.message, logMetadata);
-        throw new Error(`DB Insert Error: ${insertError.message}`);
+      if (!response.ok) {
+        const errorMsg = await response.text();
+        throw new Error(`Save post failed: ${errorMsg}`);
       }
-    } else {
-      logStep("save", "success", `Saved post: ${slug}`, logMetadata);
-    }
+      return response.json();
+    });
+
+    const slug = saveResult.slug;
+    logMetadata["slug"] = slug;
+    logStep("save", "success", `Saved post: ${slug}`, logMetadata);
 
     // 4. Generate & Post Tweet
     console.log(`[Auto-Run] Preparing social distribution`);
@@ -133,6 +92,7 @@ export async function GET(request: Request) {
       if (tweetResult.error) {
         logStep("tweet", "fail", tweetResult.error, logMetadata);
       } else {
+        const supabase = getSupabaseAdmin();
         await supabase.from("posts").update({ tweeted: true }).eq("slug", slug);
         logStep("tweet", "success", "Posted to X successfully", logMetadata);
       }

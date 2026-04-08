@@ -35,14 +35,14 @@ export default function Sidebar({ trendingPosts = [] }: SidebarProps) {
               <li key={post.id || i} className="group cursor-pointer relative">
                 <Link href={`/blog/${post.slug || '#'}`}>
                   <div className="flex gap-4 items-start relative z-10">
-                    <span className="text-2xl font-black text-gray-200 dark:text-white/10 group-hover:text-accent-cyan transition-colors">
+                    <span className="text-2xl font-black text-gray-300 dark:text-white/10 group-hover:text-accent-cyan transition-colors">
                       0{i + 1}
                     </span>
                     <div>
-                      <h5 className="text-sm font-bold text-gray-800 dark:text-gray-200 leading-snug group-hover:text-accent-cyan transition-colors line-clamp-2">
+                      <h5 className="text-sm font-bold text-gray-900 dark:text-gray-200 leading-snug group-hover:text-accent-cyan transition-colors line-clamp-2">
                         {post.title}
                       </h5>
-                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 font-medium">
+                      <p className="text-xs text-gray-600 dark:text-gray-500 mt-1 font-medium italic">
                         {Math.floor((post.title.length * 15.4) % 1000) + 200 } views
                       </p>
                     </div>
@@ -65,8 +65,8 @@ export default function Sidebar({ trendingPosts = [] }: SidebarProps) {
         <div className="absolute -top-10 -right-10 w-32 h-32 bg-accent-purple/30 blur-3xl rounded-full" />
         
         <div className="relative z-10">
-          <h4 className="text-white font-bold text-lg mb-2">Alpha Delivered.</h4>
-          <p className="text-gray-400 text-sm mb-6 leading-relaxed">
+          <h4 className="text-gray-900 dark:text-white font-bold text-lg mb-2">Alpha Delivered.</h4>
+          <p className="text-gray-700 dark:text-gray-400 text-sm mb-6 leading-relaxed">
             Get the latest AI-generated crypto intel and market sentiment directly in your inbox.
           </p>
           
@@ -74,9 +74,9 @@ export default function Sidebar({ trendingPosts = [] }: SidebarProps) {
             <input 
               type="email" 
               placeholder="Enter your email address" 
-              className="w-full px-4 py-3 rounded-xl text-sm bg-black/5 dark:bg-black/50 text-primary placeholder-gray-500 border border-black/10 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-accent-cyan focus:border-transparent transition-all"
+              className="w-full px-4 py-3 rounded-xl text-sm bg-black/5 dark:bg-black/50 text-gray-900 dark:text-white placeholder-gray-500 border border-black/10 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-accent-cyan focus:border-transparent transition-all"
             />
-            <button className="w-full group relative overflow-hidden bg-white dark:bg-accent-blue hover:bg-gray-50 dark:hover:bg-accent-cyan text-gray-900 dark:text-white font-bold py-3 px-4 rounded-xl text-sm transition-all shadow-md active:scale-95">
+            <button className="w-full group relative overflow-hidden bg-gray-900 dark:bg-accent-blue hover:bg-black dark:hover:bg-accent-cyan text-white font-bold py-3 px-4 rounded-xl text-sm transition-all shadow-md active:scale-95">
               <span className="relative z-10">Join the Waitlist</span>
             </button>
           </div>

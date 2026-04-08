@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import NewsTicker from "./NewsTicker";
 import ParticleBackground from "./ParticleBackground";
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
@@ -21,7 +22,8 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       <ParticleBackground />
       <div className="relative z-10 flex flex-col min-h-screen">
         <Navbar />
-        <main className="flex-grow pt-24">
+        <NewsTicker />
+        <main className="flex-grow pt-32">
           {children}
         </main>
         <Footer />

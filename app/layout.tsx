@@ -18,6 +18,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const meta: Metadata = {
     title: settings.siteName || "Crypto News",
     description: settings.siteDescription || "AI Powered Crypto Insights & Technical Analysis",
+    verification: {
+      google: "i6B4Yq58IOQudXM1CT_pEhPAS3EdqHbAso6oLal_Eik",
+    },
     other: {
       monetag: "cd4e6eaff050723852017d532769ba46"
     }

@@ -8,7 +8,6 @@ import Container from "@/components/Container";
 import GlassCard from "@/components/GlassCard";
 import ReadingProgress from "@/components/ReadingProgress";
 import AdSlot from "@/components/AdSlot";
-import SocialShare from "@/components/SocialShare";
 import AuthorAndShareBlock from "@/components/AuthorAndShareBlock";
 import { getAllSettings } from "@/app/actions/settings";
 

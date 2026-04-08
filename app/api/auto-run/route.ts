@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { logStep } from "@/lib/logger";
 import { withRetry } from "@/lib/ai-retry";
+import { generateImage } from "@/lib/image";
 
 const topics = [
   "Bitcoin price prediction",
@@ -54,6 +55,19 @@ export async function GET(request: Request) {
 
     logStep("generate", "success", `Generated post: ${postData.title}`, logMetadata);
 
+    // 2.5 Generate Image
+    console.log(`[Auto-Run] Generating image for: ${topic}`);
+    let imageUrl = "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1600&q=80"; // fallback
+    try {
+      if (postData.image?.prompt) {
+        imageUrl = await generateImage(postData.image.prompt, postData.image.negative_prompt);
+        logStep("generate_image", "success", "Generated AI cover image", logMetadata);
+      }
+    } catch (imgError: any) {
+      console.warn(`[Auto-Run] Image generation failed, using fallback. Error: ${imgError.message}`);
+      logStep("generate_image", "fail", imgError.message, logMetadata);
+    }
+
     // 3. Save to Supabase (Observability Step)
     const slug = generateSlug(postData.title);
     logMetadata["slug"] = slug;
@@ -65,7 +79,8 @@ export async function GET(request: Request) {
           title: postData.title,
           slug: slug,
           content: postData.content,
-          meta_description: postData.meta,
+          meta_description: postData.meta_description || postData.meta,
+          image_url: imageUrl,
         },
       ])
       .select()
@@ -76,7 +91,7 @@ export async function GET(request: Request) {
         const newSlug = `${slug}-${Math.floor(Math.random() * 10000)}`;
         const { error: retryError } = await supabase
           .from("posts")
-          .insert([{ title: postData.title, slug: newSlug, content: postData.content, meta_description: postData.meta }]);
+          .insert([{ title: postData.title, slug: newSlug, content: postData.content, meta_description: postData.meta_description || postData.meta, image_url: imageUrl }]);
         
         if (retryError) throw new Error(`DB collision handling failed: ${retryError.message}`);
         logStep("save", "success", "Saved post with collision slug", logMetadata);

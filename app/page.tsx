@@ -30,13 +30,13 @@ export default async function Home() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
               </span>
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-green-500">System Live: AI Nodes Active</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-green-500">Live Crypto Market Feed</span>
             </div>
 
             <h1 className="text-4xl sm:text-6xl lg:text-8xl font-black tracking-tighter text-gray-900 dark:text-white mb-8 leading-[0.95] drop-shadow-sm">
-              Crypto Intel <br className="hidden sm:block" />
+              CryptoNews <br className="hidden sm:block" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan via-accent-blue to-accent-purple">
-                Refined by AI
+                Market Insights
               </span>
             </h1>
             <p className="mt-8 text-lg sm:text-xl leading-relaxed text-gray-500 dark:text-white/40 max-w-2xl mx-auto font-bold tracking-tight">

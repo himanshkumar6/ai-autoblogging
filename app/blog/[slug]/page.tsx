@@ -2,7 +2,8 @@ import { getSupabase } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Twitter, Linkedin, Link as LinkIcon, Share2 } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft, Twitter, Linkedin, Link as LinkIcon, Share2, Image as ImageIcon } from "lucide-react";
 import Container from "@/components/Container";
 import GlassCard from "@/components/GlassCard";
 import ReadingProgress from "@/components/ReadingProgress";
@@ -72,8 +73,22 @@ export default async function BlogPostPage({ params }: Props) {
           </Link>
         </div>
 
-        <GlassCard className="p-8 md:p-16 border-t border-b sm:border border-black/5 dark:border-white/5 !bg-white/40 dark:!bg-[#0a0a0f]/40 backdrop-blur-3xl shadow-2xl">
+        <GlassCard className="p-8 md:p-16 border-t border-b sm:border border-black/5 dark:border-white/5 !bg-white/40 dark:!bg-[#0a0a0f]/40 backdrop-blur-3xl shadow-2xl overflow-hidden">
           
+          {post.image_url && (
+            <div className="relative w-full aspect-[16/9] -mx-8 -mt-8 mb-16 md:-mx-16 md:-mt-16 overflow-hidden bg-white/5 border-b border-black/5 dark:border-white/5">
+              <Image 
+                src={post.image_url} 
+                alt={post.title} 
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1200px"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f]/80 via-transparent to-transparent opacity-80" />
+            </div>
+          )}
+
           {/* Article Header */}
           <header className="mb-16 flex flex-col items-center text-center">
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-3 text-[11px] font-black uppercase tracking-[0.2em] mb-10">

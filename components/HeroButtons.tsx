@@ -19,13 +19,6 @@ export default function HeroButtons() {
         <span className="relative z-10 group-hover:text-white transition-colors">Start Reading</span>
         <ArrowRight size={18} className="relative z-10 group-hover:translate-x-1 group-hover:text-white transition-all" />
       </button>
-      
-      <button
-        onClick={(e) => handleScroll(e, "about")}
-        className="rounded-xl px-8 py-4 text-sm font-bold text-primary dark:text-white border border-black/10 dark:border-white/10 glass-bg hover:bg-black/5 dark:hover:bg-white/10 transition-all duration-300 hover:scale-[0.98]"
-      >
-        View Analytics
-      </button>
     </div>
   );
 }

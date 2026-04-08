@@ -1,8 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Image as ImageIcon } from "lucide-react";
 import GlassCard from "./GlassCard";
 
 interface BlogCardProps {
@@ -14,6 +15,7 @@ interface BlogCardProps {
     created_at: string;
     content?: string; // Optional for read time calc
     tweeted?: boolean;
+    image_url?: string;
   };
   index: number;
 }
@@ -45,10 +47,29 @@ export default function BlogCard({ post, index }: BlogCardProps) {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.05, ease: "easeOut" }}
-      className="p-6 sm:p-8 flex flex-col justify-between h-full group border border-white/5 hover:border-white/10 transition-all duration-300"
+      className="flex flex-col justify-between h-full group border border-white/5 hover:border-white/10 transition-all duration-300 overflow-hidden"
     >
-      <div>
-        <div className="flex items-center justify-between mb-6">
+      <div className="relative w-full aspect-[16/9] overflow-hidden bg-white/5">
+        {post.image_url ? (
+          <Image 
+            src={post.image_url} 
+            alt={post.title} 
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-white/20">
+            <ImageIcon size={32} />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/20 to-transparent opacity-80" />
+      </div>
+
+      <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between">
+        <div>
+          <div className="flex items-center justify-between mb-6">
           <span className={`text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-lg border ${badgeColor}`}>
             {category}
           </span>
@@ -79,6 +100,7 @@ export default function BlogCard({ post, index }: BlogCardProps) {
         <time dateTime={post.created_at} className="text-[10px] text-gray-400 dark:text-white/20 font-black uppercase tracking-tighter">
           {date}
         </time>
+      </div>
       </div>
     </GlassCard>
   );

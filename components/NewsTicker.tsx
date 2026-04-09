@@ -8,6 +8,13 @@ import { getSupabase } from "@/lib/supabase-core";
 export default function NewsTicker() {
   const [headlines, setHeadlines] = useState<any[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     const fetchHeadlines = async () => {
@@ -34,7 +41,11 @@ export default function NewsTicker() {
   if (headlines.length === 0) return null;
 
   return (
-    <div className="fixed top-20 w-full z-40 bg-white/60 dark:bg-[#0a0a0f]/60 backdrop-blur-md border-b border-black/5 dark:border-white/5 h-10 flex items-center overflow-hidden">
+    <div className={`fixed top-20 w-full z-40 h-10 flex items-center overflow-hidden transition-all duration-300 ${
+      scrolled 
+        ? "bg-white/80 dark:bg-[#0a0a0f]/80 backdrop-blur-xl border-b border-black/5 dark:border-white/10" 
+        : "bg-transparent border-b border-transparent"
+    }`}>
       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex items-center gap-4">
         {/* Breaking Badge */}
         <div className="flex-shrink-0 flex items-center gap-2">

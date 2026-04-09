@@ -123,12 +123,71 @@ export default function AdminDashboard() {
         </motion.div>
       </div>
 
-      {/* 3. System Status Section */}
+      {/* 3. System Status & Actions Section */}
       <motion.div 
         variants={itemVariants}
-        className="pt-4"
+        className="pt-4 grid grid-cols-1 lg:grid-cols-3 gap-8"
       >
-        <GlassCard className="p-6 md:p-10 border-gray-200 dark:border-white/5 bg-white/40 dark:bg-white/[0.02] backdrop-blur-xl">
+        {/* Actions Card */}
+        <GlassCard className="lg:col-span-1 p-6 md:p-8 bg-purple-600/5 border-purple-500/20 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <Zap className="text-purple-500" size={24} />
+              <h2 className="text-xl font-black text-gray-900 dark:text-white">Auto-Pilot</h2>
+            </div>
+            <p className="text-gray-500 dark:text-gray-400 text-xs font-bold leading-relaxed mb-8">
+              Manually trigger the full AI pipeline: Trend Discovery → Content Generation → Social Automation.
+            </p>
+          </div>
+          
+          <button 
+            onClick={async () => {
+              const confirmRun = confirm("Are you sure you want to trigger the full autonomous pipeline? This may take 2-5 minutes.");
+              if (!confirmRun) return;
+              
+              const btn = document.getElementById('autorun-btn');
+              try {
+                if (btn) {
+                  btn.innerText = "Processing Vectors...";
+                  btn.setAttribute('disabled', 'true');
+                  btn.classList.add('opacity-50');
+                }
+                
+                const res = await fetch('/api/auto-generate', {
+                  method: 'POST',
+                  headers: { 
+                    'Authorization': `Bearer ${process.env.NEXT_PUBLIC_ADMIN_TOKEN}`,
+                    'Content-Type': 'application/json'
+                  }
+                });
+                
+                const result = await res.json();
+                
+                if (result.success) {
+                  alert("🚀 Pipeline Successful! New post generated: " + (result.data?.title || "Unknown Title"));
+                  window.location.reload();
+                } else {
+                  alert("❌ Pipeline Error: " + (result.error || "Execution failed"));
+                }
+              } catch (err) {
+                alert("❌ Critical Error: Request timed out or server crashed.");
+              } finally {
+                if (btn) {
+                  btn.innerText = "Trigger Autonomous Pipeline";
+                  btn.removeAttribute('disabled');
+                  btn.classList.remove('opacity-50');
+                }
+              }
+            }}
+            id="autorun-btn"
+            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black py-4 rounded-2xl shadow-xl shadow-purple-500/20 transition-all active:scale-95 text-xs uppercase tracking-widest"
+          >
+            Trigger Autonomous Pipeline
+          </button>
+        </GlassCard>
+
+        {/* Status Card */}
+        <GlassCard className="lg:col-span-2 p-6 md:p-10 border-gray-200 dark:border-white/5 bg-white/40 dark:bg-white/[0.02] backdrop-blur-xl">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-10 gap-6">
             <h2 className="text-xl md:text-2xl font-black flex items-center gap-3 text-gray-900 dark:text-white">
               <Server size={24} className="text-purple-600 dark:text-purple-400" />
@@ -148,8 +207,8 @@ export default function AdminDashboard() {
               color="green" 
             />
             <StatusRow 
-              icon={CheckCircle2} 
-              label="Anthropic Claude-3.5-Sonnet Engine" 
+              icon={Zap} 
+              label="Multi-Niche AI Engine (Crypto/NASA)" 
               status="Ready" 
               color="purple" 
             />

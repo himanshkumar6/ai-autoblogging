@@ -58,6 +58,8 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Rec
     xApiSecret: initialSettings.xApiSecret || "",
     xAccessToken: initialSettings.xAccessToken || "",
     xAutoThread: initialSettings.xAutoThread === "true" || initialSettings.xAutoThread === true,
+    targetNiches: initialSettings.targetNiches || "Crypto, NASA, AI",
+    globalNiche: initialSettings.globalNiche || "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -194,6 +196,22 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Rec
                          Choose New Asset
                        </label>
                        <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-3 font-black uppercase tracking-widest">Replaces the globe icon on browser tabs.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-gray-100 dark:border-white/5 space-y-6">
+                  <h3 className="text-sm font-black text-gray-900 dark:text-white flex items-center gap-2 uppercase tracking-widest">
+                    <Bot size={18} className="text-purple-500"/> Niche & Topic Orchestration
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-2">Target Niches (Comma Separated)</label>
+                      <input type="text" name="targetNiches" placeholder="Crypto, NASA, AI, Tech" value={formData.targetNiches} onChange={handleChange} className="w-full bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/5 transition-all font-bold text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-2">Global Niche Override (Optional)</label>
+                      <input type="text" name="globalNiche" placeholder="Leave empty for dynamic niches" value={formData.globalNiche} onChange={handleChange} className="w-full bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-xl px-5 py-4 text-gray-900 dark:text-white outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/5 transition-all font-bold text-sm" />
                     </div>
                   </div>
                 </div>

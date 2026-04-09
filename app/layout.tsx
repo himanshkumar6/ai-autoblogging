@@ -78,9 +78,15 @@ export default async function RootLayout({
         </Providers>
 
         {/* Global Social Bar / Overlay Ad */}
-        <div className="bg-transparent dark:bg-transparent w-full m-0 p-0">
-          <AdSlot adCode={settings.ads?.ad_social_bar} className="!my-0 !bg-transparent dark:!bg-transparent" />
-        </div>
+        {settings.ads?.ad_social_bar && (
+          <div className="bg-transparent dark:bg-transparent w-full m-0 p-0 border-none outline-none overflow-hidden">
+            <AdSlot 
+              adCode={settings.ads.ad_social_bar} 
+              className="!my-0 !py-0 !min-h-0 !bg-transparent dark:!bg-transparent" 
+              minHeight="0px"
+            />
+          </div>
+        )}
       </body>
     </html>
   );

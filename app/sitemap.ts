@@ -3,14 +3,26 @@ import { getServerSupabase } from "@/lib/supabase-core";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://cryptonewsai.vercel.app";
-  const supabase = getServerSupabase();
 
-  // 1. Fetch all published blog posts
-  const { data: posts } = await supabase
-    .from("posts")
-    .select("slug, created_at, focus_keyword")
-    .eq("published", true)
-    .order("created_at", { ascending: false });
+  // 1. Fetch all published blog posts (with error protection)
+  let posts: { slug: string; created_at: string }[] = [];
+  try {
+    const supabase = getServerSupabase();
+    const { data, error } = await supabase
+      .from("posts")
+      .select("slug, created_at")
+      .eq("published", true)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    posts = data || [];
+    console.log(`[Sitemap] Fetched ${posts.length} posts`);
+  } catch (e) {
+    console.error(
+      "[Sitemap] Supabase fetch failed — returning static only:",
+      e,
+    );
+  }
 
   // 2. Static routes
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -47,11 +59,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   // 3. Dynamic blog routes
-  // Recent posts (last 7 days) get higher priority
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-  const dynamicRoutes: MetadataRoute.Sitemap = (posts || []).map((post) => {
+  const dynamicRoutes: MetadataRoute.Sitemap = posts.map((post) => {
     const postDate = new Date(post.created_at);
     const isRecent = postDate > sevenDaysAgo;
 
@@ -59,7 +70,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${baseUrl}/blog/${post.slug}`,
       lastModified: postDate,
       changeFrequency: isRecent ? "daily" : "weekly",
-      priority: isRecent ? 0.9 : 0.8, // Recent = higher priority
+      priority: isRecent ? 0.9 : 0.8,
     };
   });
 

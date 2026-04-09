@@ -15,15 +15,15 @@ const ptSerif = PT_Serif({ subsets: ["latin"], weight: ["400", "700"], display: 
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getAllSettings();
-  const siteName = settings.siteName || "AI News Portal";
-  const globalNiche = settings.globalNiche || "Breaking Technology & Space News";
+  const siteName = settings.siteName || "NexusPulse";
+  const globalNiche = settings.globalNiche || "Cosmic Discoveries & Financial Intelligence";
 
   const meta: Metadata = {
     title: {
       default: siteName,
       template: `%s | ${siteName}`,
     },
-    description: settings.siteDescription || `AI-powered ${globalNiche.toLowerCase()} insights and deep technical analysis.`,
+    description: settings.siteDescription || `Real-time insights from the intersection of ${globalNiche.toLowerCase()}.`,
     verification: {
       google: "i6B4Yq58IOQudXM1CT_pEhPAS3EdqHbAso6oLal_Eik",
     },

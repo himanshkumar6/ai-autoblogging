@@ -417,7 +417,7 @@ export default function SettingsForm({ initialSettings }: { initialSettings: Rec
               <div className="space-y-6">
                 <div className="flex items-center gap-4 p-5 rounded-2xl bg-gray-50 dark:bg-white/[0.02] border border-gray-200 dark:border-white/10">
                   <input type="checkbox" name="xAutoThread" checked={formData.xAutoThread} onChange={handleChange} className="w-6 h-6 accent-black dark:accent-white rounded-lg cursor-pointer" />
-                  <label className="text-sm font-black text-gray-900 dark:text-white cursor-pointer select-none">Enable Automatic Thread Synthesis on new AI Vectors</label>
+                  <label className="text-sm font-black text-gray-900 dark:text-white cursor-pointer select-none">Enable Automatic Thread Synthesis on new Data Signals</label>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>

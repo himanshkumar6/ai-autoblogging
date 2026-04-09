@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const canonicalUrl = `https://cryptonewsai.vercel.app/blog/${params.slug}`;
 
   return {
-    title: `${data.title} | CryptoNewsAI`,
+    title: `${data.title} | NexusPulse`,
     description: data.meta_description,
     keywords: [data.focus_keyword, ...(data.secondary_keywords || [])].filter(Boolean).join(", "),
     alternates: {
@@ -127,12 +127,12 @@ export default async function BlogPostPage({ params }: Props) {
     url: canonicalUrl,
     author: {
       "@type": "Organization",
-      name: "CryptoNewsAI",
+      name: "NexusPulse",
       url: "https://cryptonewsai.vercel.app",
     },
     publisher: {
       "@type": "Organization",
-      name: "CryptoNewsAI",
+      name: "NexusPulse",
       logo: {
         "@type": "ImageObject",
         url: "https://cryptonewsai.vercel.app/logo.png",

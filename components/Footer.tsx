@@ -137,14 +137,14 @@ export default function Footer() {
           className="mt-4 pt-4 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4"
         >
           <div className="text-xs text-gray-500 font-medium">
-            © {currentYear} Crypto News Engine. All rights reserved.
+            © {currentYear} NexusPulse Intelligence. All rights reserved.
           </div>
           <div className="flex items-center gap-1.5 text-xs text-secondary opacity-60">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+            <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
             System Status: Optimal
           </div>
           <div className="text-xs text-gray-500 italic">
-            Empowered by Advanced AI Intelligence
+            Empowered by Autonomous Systems
           </div>
         </motion.div>
       </div>

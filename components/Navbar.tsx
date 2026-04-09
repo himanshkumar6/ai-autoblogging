@@ -40,9 +40,22 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          <Link href="/" className="flex items-center gap-2 group">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative flex items-center justify-center p-2 rounded-xl bg-gradient-to-br from-gray-50 to-gray-200 dark:from-white/5 dark:to-white/10 border border-black/5 dark:border-white/10 shadow-sm group-hover:scale-105 transition-all duration-300">
+               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6">
+                  <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="url(#nexus-grad)" fillOpacity="0.8" />
+                  <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="url(#nexus-grad)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <defs>
+                    <linearGradient id="nexus-grad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#22d3ee" />
+                      <stop offset="0.5" stopColor="#3b82f6" />
+                      <stop offset="1" stopColor="#a855f7" />
+                    </linearGradient>
+                  </defs>
+               </svg>
+            </div>
             <span className="text-2xl font-black tracking-tighter text-gray-900 dark:text-white drop-shadow-md">
-              Crypto<span className="bg-clip-text text-transparent bg-gradient-to-r from-accent-cyan to-accent-blue transition-all group-hover:from-accent-purple group-hover:to-accent-pink">News</span>
+              Nexus<span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 transition-all group-hover:from-purple-500 group-hover:to-pink-500">Pulse</span>
             </span>
           </Link>
           

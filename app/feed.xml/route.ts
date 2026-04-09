@@ -27,9 +27,9 @@ export async function GET() {
   const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>CryptoNewsAI — Latest Crypto News</title>
+    <title>NexusPulse — Galactic & Financial Intelligence</title>
     <link>${baseUrl}</link>
-    <description>Latest AI-generated crypto news and market analysis</description>
+    <description>Real-time autonomous news from the intersection of technology, space, and markets.</description>
     <language>en-us</language>
     <atom:link href="${baseUrl}/feed.xml" rel="self" type="application/rss+xml"/>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>

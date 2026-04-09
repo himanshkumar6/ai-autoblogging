@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 
 const ADMIN_EMAILS = [
-  "admin@cryptonews.local",
+  "admin@nexuspulse.local",
   process.env.ADMIN_EMAIL || ""
 ].filter(Boolean);
 

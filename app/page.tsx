@@ -52,22 +52,22 @@ export default async function Home({ searchParams }: Props) {
         <Container>
           <div className="max-w-4xl mx-auto text-center relative z-10">
             {/* Live Status Indicator */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 mb-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 mb-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
               </span>
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-green-500">Live Crypto Market Feed</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500">Autonomous Intelligence Feed</span>
             </div>
 
             <h1 className="text-4xl sm:text-6xl lg:text-8xl font-black tracking-tighter text-gray-900 dark:text-white mb-8 leading-[0.95] drop-shadow-sm">
-              CryptoNews <br className="hidden sm:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan via-accent-blue to-accent-purple">
-                Market Insights
+              NexusPulse <br className="hidden sm:block" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600">
+                The New Frontier
               </span>
             </h1>
             <p className="mt-8 text-lg sm:text-xl leading-relaxed text-gray-500 dark:text-white/40 max-w-2xl mx-auto font-bold tracking-tight">
-              Curated daily market analysis and on-chain breakthroughs, distilled into high-impact articles.
+              Real-time intelligence from the intersection of financial markets, cosmic discoveries, and the future of technology.
             </p>
             <div className="mt-12 flex justify-center scale-110 sm:scale-125">
               <HeroButtons />
@@ -94,7 +94,7 @@ export default async function Home({ searchParams }: Props) {
           {/* Main Feed */}
           <div className="min-w-0 flex flex-col gap-6">
             <div className="flex items-center gap-4 mb-4">
-              <h2 className="text-3xl font-black tracking-tight text-primary dark:text-white">Market Feeds</h2>
+              <h2 className="text-3xl font-black tracking-tight text-primary dark:text-white">Intelligence Streams</h2>
               <div className="h-px flex-1 bg-gradient-to-r from-black/10 dark:from-white/10 to-transparent" />
             </div>
 
